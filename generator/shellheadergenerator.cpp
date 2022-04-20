@@ -60,8 +60,8 @@ void ShellHeaderGenerator::write(QTextStream &s, const AbstractMetaClass *meta_c
 
     QString include_block = "QTSCRIPTSHELL_" + meta_class->name().toUpper() + "_H";
 
-    s << "#ifndef " << include_block << endl
-      << "#define " << include_block << endl << endl;
+    s << "#ifndef " << include_block << Qt::endl
+      << "#define " << include_block << Qt::endl << Qt::endl;
 
     Include inc = meta_class->typeEntry()->include();
     s << "#include ";
@@ -74,40 +74,40 @@ void ShellHeaderGenerator::write(QTextStream &s, const AbstractMetaClass *meta_c
         s << ">";
     else
         s << "\"";
-    s << endl << endl;
+    s << Qt::endl << Qt::endl;
 
-    s << "#include <QtScript/qscriptvalue.h>" << endl;
-    s << "#include <__package_shared.h>" << endl;
-    s << endl;
+    s << "#include <QtScript/qscriptvalue.h>" << Qt::endl;
+    s << "#include <__package_shared.h>" << Qt::endl;
+    s << Qt::endl;
 
     QString packName = meta_class->package().replace(".", "_");
 
     if (!meta_class->generateShellClass()) {
-        s << "#endif" << endl << endl;
+        s << "#endif" << Qt::endl << Qt::endl;
         priGenerator->addHeader(packName, fileNameForClass(meta_class));
         return ;
     }
 
     s << "class " << shellClassName(meta_class)
-      << " : public " << meta_class->qualifiedCppName() << endl
-      << "{" << endl;
+      << " : public " << meta_class->qualifiedCppName() << Qt::endl
+      << "{" << Qt::endl;
 
 
-    s << "public:" << endl;
+    s << "public:" << Qt::endl;
     foreach (const AbstractMetaFunction *function, meta_class->functions()) {
         if (function->isConstructor() && !function->isPrivate()) {
             s << "    ";
             writeFunctionSignature(s, function, 0, QString(),
                                    Option(IncludeDefaultExpression | OriginalName | ShowStatic));
-            s << ";" << endl;
+            s << ";" << Qt::endl;
         }
     }
 
     s << "    ~" << shellClassName(meta_class) << "()";
     if (!meta_class->destructorException().isEmpty())
         s << " " << meta_class->destructorException();
-    s << ";" << endl;
-    s << endl;
+    s << ";" << Qt::endl;
+    s << Qt::endl;
 
     AbstractMetaFunctionList functions = meta_class->queryFunctions(
         AbstractMetaClass:: VirtualFunctions | AbstractMetaClass::WasVisible
@@ -118,15 +118,15 @@ void ShellHeaderGenerator::write(QTextStream &s, const AbstractMetaClass *meta_c
         s << "    ";
         writeFunctionSignature(s, functions.at(i), 0, QString(),
                                Option(IncludeDefaultExpression | OriginalName | ShowStatic | UnderscoreSpaces));
-        s << ";" << endl;
+        s << ";" << Qt::endl;
     }
 
     writeInjectedCode(s, meta_class);
 
-    s  << endl << "    QScriptValue __qtscript_self;" << endl;
+    s  << Qt::endl << "    QScriptValue __qtscript_self;" << Qt::endl;
 
-    s  << "};" << endl << endl
-       << "#endif // " << include_block << endl;
+    s  << "};" << Qt::endl << Qt::endl
+       << "#endif // " << include_block << Qt::endl;
 
     priGenerator->addHeader(packName, fileNameForClass(meta_class));
 }
@@ -136,7 +136,7 @@ void ShellHeaderGenerator::writeInjectedCode(QTextStream &s, const AbstractMetaC
     CodeSnipList code_snips = meta_class->typeEntry()->codeSnips();
     foreach (const CodeSnip &cs, code_snips) {
         if (cs.language == TypeSystem::ShellDeclaration) {
-            s << cs.code() << endl;
+            s << cs.code() << Qt::endl;
         }
     }
 }

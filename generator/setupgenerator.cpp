@@ -82,47 +82,47 @@ void SetupGenerator::generate()
             if (FileOut::license)
                 writeQtScriptQtBindingsLicense(s);
 
-            s << "#include <QtScript/QScriptValue>" << endl
-              << "#include <QtScript/QScriptEngine>" << endl;
+            s << "#include <QtScript/QScriptValue>" << Qt::endl
+              << "#include <QtScript/QScriptEngine>" << Qt::endl;
 #ifdef Q_SCRIPT_LAZY_GENERATOR
-            s << "#include <QtScript/QScriptClass>" << endl
-              << "#include <QtScript/QScriptString>" << endl;
+            s << "#include <QtScript/QScriptClass>" << Qt::endl
+              << "#include <QtScript/QScriptString>" << Qt::endl;
 #endif
-            s << endl;
+            s << Qt::endl;
 
             // declare individual class creation functions
             foreach (const AbstractMetaClass *cls, list) {
-                s << "QScriptValue qtscript_create_" << cls->name() << "_class(QScriptEngine *engine);" << endl;
+                s << "QScriptValue qtscript_create_" << cls->name() << "_class(QScriptEngine *engine);" << Qt::endl;
             }
-            s << endl;
+            s << Qt::endl;
 
             // write table of class names
             {
-                s << "static const char * const qtscript_" << packName << "_class_names[] = {" << endl;
+                s << "static const char * const qtscript_" << packName << "_class_names[] = {" << Qt::endl;
                 bool needComma = false;
                 foreach (const AbstractMetaClass *cls, list) {
                     s << "    ";
                     if (needComma)
                         s << ", ";
-                    s << "\"" << cls->name() << "\"" << endl;
+                    s << "\"" << cls->name() << "\"" << Qt::endl;
                     needComma = true;
                 }
-                s << "};" << endl << endl;
+                s << "};" << Qt::endl << Qt::endl;
             }
 
             // write table of function pointers
             {
-                s << "typedef QScriptValue (*QtBindingCreator)(QScriptEngine *engine);" << endl;
-                s << "static const QtBindingCreator qtscript_" << packName << "_class_functions[] = {" << endl;
+                s << "typedef QScriptValue (*QtBindingCreator)(QScriptEngine *engine);" << Qt::endl;
+                s << "static const QtBindingCreator qtscript_" << packName << "_class_functions[] = {" << Qt::endl;
                 bool needComma = false;
                 foreach (const AbstractMetaClass *cls, list) {
                     s << "    ";
                     if (needComma)
                         s << ", ";
-                    s << "qtscript_create_" << cls->name() << "_class" << endl;
+                    s << "qtscript_create_" << cls->name() << "_class" << Qt::endl;
                     needComma = true;
                 }
-                s << "};" << endl << endl;
+                s << "};" << Qt::endl << Qt::endl;
             }
 
 #ifdef Q_SCRIPT_LAZY_GENERATOR
@@ -137,9 +137,9 @@ void SetupGenerator::generate()
                         maybeDeclareMetaType(s, name, registeredTypeNames);
                     maybeDeclareMetaType(s, name + "*", registeredTypeNames);
                 }
-                s << endl;
+                s << Qt::endl;
                 // write table of metatype-ids
-                s << "static const int qtscript_" << packName << "_metatype_ids[] = {" << endl;
+                s << "static const int qtscript_" << packName << "_metatype_ids[] = {" << Qt::endl;
                 for (int i = 0; i < list.size(); ++i) {
                     const AbstractMetaClass *cls = list.at(i);
                     s << "    ";
@@ -155,99 +155,99 @@ void SetupGenerator::generate()
                             s << "-1";
                         s << ", qMetaTypeId<" << name << "*>()";
                     }
-                    s << endl;
+                    s << Qt::endl;
                 }
-                s << "};" << endl << endl;
+                s << "};" << Qt::endl << Qt::endl;
             }
 
             // write the fake prototype class
             {
-                s << "class qtscript_" << packName << "_FakePrototype : public QScriptClass" << endl
-                  << "{" << endl
-                  << "public:" << endl
-                  << "    qtscript_" << packName << "_FakePrototype(QScriptEngine *engine)" << endl
-                  << "        : QScriptClass(engine) {}" << endl << endl
+                s << "class qtscript_" << packName << "_FakePrototype : public QScriptClass" << Qt::endl
+                  << "{" << Qt::endl
+                  << "public:" << Qt::endl
+                  << "    qtscript_" << packName << "_FakePrototype(QScriptEngine *engine)" << Qt::endl
+                  << "        : QScriptClass(engine) {}" << Qt::endl << Qt::endl
 
-                  << "    QueryFlags queryProperty(const QScriptValue &fake," << endl
-                  << "        const QScriptString &name, QueryFlags flags, uint *)" << endl
-                  << "    {" << endl
-                  << "        if (fake.prototype().isValid())" << endl
-                  << "            return 0;" << endl
-                  << "        int classIndex = fake.data().toInt32();" << endl
-                  << "        const char *className = qtscript_" << packName << "_class_names[classIndex];" << endl
-//              << "        qDebug() << \"faking\" << className;" << endl
-                  << "        QScriptValue extensionObject = engine()->globalObject();" << endl
-                  << "        QScriptValue ctor = extensionObject.property(className);" << endl
-                  << "        QScriptValue genuine = ctor.property(\"prototype\");" << endl
-                  << "        Q_ASSERT(genuine.isObject());" << endl
-                  << "        const_cast<QScriptValue&>(fake).setPrototype(genuine);" << endl
-                  << "        if (!genuine.property(name).isValid())" << endl
-                  << "            flags &= ~HandlesReadAccess;" << endl
-                  << "        return flags & ~HandlesWriteAccess;" << endl
-                  << "    }" << endl << endl
+                  << "    QueryFlags queryProperty(const QScriptValue &fake," << Qt::endl
+                  << "        const QScriptString &name, QueryFlags flags, uint *)" << Qt::endl
+                  << "    {" << Qt::endl
+                  << "        if (fake.prototype().isValid())" << Qt::endl
+                  << "            return 0;" << Qt::endl
+                  << "        int classIndex = fake.data().toInt32();" << Qt::endl
+                  << "        const char *className = qtscript_" << packName << "_class_names[classIndex];" << Qt::endl
+//              << "        qDebug() << \"faking\" << className;" << Qt::endl
+                  << "        QScriptValue extensionObject = engine()->globalObject();" << Qt::endl
+                  << "        QScriptValue ctor = extensionObject.property(className);" << Qt::endl
+                  << "        QScriptValue genuine = ctor.property(\"prototype\");" << Qt::endl
+                  << "        Q_ASSERT(genuine.isObject());" << Qt::endl
+                  << "        const_cast<QScriptValue&>(fake).setPrototype(genuine);" << Qt::endl
+                  << "        if (!genuine.property(name).isValid())" << Qt::endl
+                  << "            flags &= ~HandlesReadAccess;" << Qt::endl
+                  << "        return flags & ~HandlesWriteAccess;" << Qt::endl
+                  << "    }" << Qt::endl << Qt::endl
 
                   << "    QScriptValue property(const QScriptValue &fake, "
-                  << "const QScriptString &name, uint)" << endl
-                  << "    {" << endl
-                  << "        return fake.prototype().property(name, QScriptValue::ResolveLocal);" << endl
-                  << "    }" << endl
-                  << "};" << endl << endl;
+                  << "const QScriptString &name, uint)" << Qt::endl
+                  << "    {" << Qt::endl
+                  << "        return fake.prototype().property(name, QScriptValue::ResolveLocal);" << Qt::endl
+                  << "    }" << Qt::endl
+                  << "};" << Qt::endl << Qt::endl;
             }
 
             // write the lazy class loader
             {
                 s << "static QScriptValue qtscript_" << packName << "_getSetClass("
-                  << "QScriptContext *context, QScriptEngine *engine)" << endl
-                  << "{" << endl
-                  << "    QScriptValue target = context->thisObject();" << endl
-                  << "    int classIndex = context->callee().data().toInt32();" << endl
-                  << "    const char *className = qtscript_" << packName << "_class_names[classIndex];" << endl
-                  << "    qDebug() << \"loading\" << className;" << endl
+                  << "QScriptContext *context, QScriptEngine *engine)" << Qt::endl
+                  << "{" << Qt::endl
+                  << "    QScriptValue target = context->thisObject();" << Qt::endl
+                  << "    int classIndex = context->callee().data().toInt32();" << Qt::endl
+                  << "    const char *className = qtscript_" << packName << "_class_names[classIndex];" << Qt::endl
+                  << "    qDebug() << \"loading\" << className;" << Qt::endl
                   << "    target.setProperty(className, QScriptValue(), "
-                  << "QScriptValue::PropertyGetter|QScriptValue::PropertySetter);" << endl
-                  << "    if (context->argumentCount() == 1) {" << endl
-                  << "        target.setProperty(className, context->argument(0));" << endl
-                  << "    } else {" << endl
+                  << "QScriptValue::PropertyGetter|QScriptValue::PropertySetter);" << Qt::endl
+                  << "    if (context->argumentCount() == 1) {" << Qt::endl
+                  << "        target.setProperty(className, context->argument(0));" << Qt::endl
+                  << "    } else {" << Qt::endl
                   << "        target.setProperty(className, qtscript_"
-                  << packName << "_class_functions[classIndex](engine)," << endl
-                  << "            QScriptValue::SkipInEnumeration);" << endl
-                  << "    }" << endl
-                  << "    return target.property(className);" << endl
-                  << "}" << endl << endl;
+                  << packName << "_class_functions[classIndex](engine)," << Qt::endl
+                  << "            QScriptValue::SkipInEnumeration);" << Qt::endl
+                  << "    }" << Qt::endl
+                  << "    return target.property(className);" << Qt::endl
+                  << "}" << Qt::endl << Qt::endl;
             }
 #endif
 
             // bindings init function
-            s << "void qtscript_initialize_" << packName << "_bindings(QScriptValue &extensionObject)" << endl
-              << "{" << endl
-              << "    QScriptEngine *engine = extensionObject.engine();" << endl;
+            s << "void qtscript_initialize_" << packName << "_bindings(QScriptValue &extensionObject)" << Qt::endl
+              << "{" << Qt::endl
+              << "    QScriptEngine *engine = extensionObject.engine();" << Qt::endl;
 #ifdef Q_SCRIPT_LAZY_GENERATOR
-            s << "    qtscript_" << packName << "_FakePrototype *fakeProtoClass;" << endl
-              << "    fakeProtoClass = new qtscript_" << packName << "_FakePrototype(engine);" << endl;
+            s << "    qtscript_" << packName << "_FakePrototype *fakeProtoClass;" << Qt::endl
+              << "    fakeProtoClass = new qtscript_" << packName << "_FakePrototype(engine);" << Qt::endl;
 #endif
-            s << "    for (int i = 0; i < " << list.size() << "; ++i) {" << endl
+            s << "    for (int i = 0; i < " << list.size() << "; ++i) {" << Qt::endl
 #ifndef Q_SCRIPT_LAZY_GENERATOR
-              << "        extensionObject.setProperty(qtscript_" << packName << "_class_names[i]," << endl
-              << "            qtscript_" << packName << "_class_functions[i](engine)," << endl
-              << "            QScriptValue::SkipInEnumeration);" << endl
+              << "        extensionObject.setProperty(qtscript_" << packName << "_class_names[i]," << Qt::endl
+              << "            qtscript_" << packName << "_class_functions[i](engine)," << Qt::endl
+              << "            QScriptValue::SkipInEnumeration);" << Qt::endl
 #else
-              << "        QScriptValue classIndex(engine, i);" << endl
-              << "        QScriptValue fakeCtor = engine->newFunction(qtscript_" << packName << "_getSetClass);" << endl
-              << "        fakeCtor.setData(classIndex);" << endl
-              << "        extensionObject.setProperty(qtscript_" << packName << "_class_names[i]," << endl
+              << "        QScriptValue classIndex(engine, i);" << Qt::endl
+              << "        QScriptValue fakeCtor = engine->newFunction(qtscript_" << packName << "_getSetClass);" << Qt::endl
+              << "        fakeCtor.setData(classIndex);" << Qt::endl
+              << "        extensionObject.setProperty(qtscript_" << packName << "_class_names[i]," << Qt::endl
               << "            fakeCtor, QScriptValue::PropertyGetter|QScriptValue::PropertySetter"
-              << "|QScriptValue::SkipInEnumeration);" << endl
-              << "        QScriptValue fakeProto = engine->newObject(fakeProtoClass, classIndex);" << endl
-              << "        fakeProto.setPrototype(QScriptValue());" << endl
-              << "        if (qtscript_" << packName << "_metatype_ids[i*2] != -1)" << endl
+              << "|QScriptValue::SkipInEnumeration);" << Qt::endl
+              << "        QScriptValue fakeProto = engine->newObject(fakeProtoClass, classIndex);" << Qt::endl
+              << "        fakeProto.setPrototype(QScriptValue());" << Qt::endl
+              << "        if (qtscript_" << packName << "_metatype_ids[i*2] != -1)" << Qt::endl
               << "            engine->setDefaultPrototype(qtscript_"
-              << packName << "_metatype_ids[i*2], fakeProto);" << endl
-              << "        if (qtscript_" << packName << "_metatype_ids[i*2+1] != -1)" << endl
+              << packName << "_metatype_ids[i*2], fakeProto);" << Qt::endl
+              << "        if (qtscript_" << packName << "_metatype_ids[i*2+1] != -1)" << Qt::endl
               << "            engine->setDefaultPrototype(qtscript_"
-              << packName << "_metatype_ids[i*2+1], fakeProto);" << endl
+              << packName << "_metatype_ids[i*2+1], fakeProto);" << Qt::endl
 #endif
-              << "    }" << endl
-              << "}" << endl;
+              << "    }" << Qt::endl
+              << "}" << Qt::endl;
 
             if (initFile.done())
                 ++m_num_generated_written;

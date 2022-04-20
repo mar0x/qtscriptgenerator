@@ -58,21 +58,21 @@ QString DocGenerator::subDirectoryForClass(const AbstractMetaClass *) const
 
 static void writeDocumentHeader(QTextStream &s, const QString &title)
 {
-    s << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" << endl
-      << "<!DOCTYPE html" << endl
-      << "    PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"DTD/xhtml1-strict.dtd\">" << endl
-      << "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">" << endl
-      << "<head>" << endl
-      << "  <title>" << title << "</title>" << endl
-      << "  <link href=\"classic.css\" rel=\"stylesheet\" type=\"text/css\" />" << endl
-      << "</head>" << endl
-      << "<body>" << endl;
+    s << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" << Qt::endl
+      << "<!DOCTYPE html" << Qt::endl
+      << "    PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"DTD/xhtml1-strict.dtd\">" << Qt::endl
+      << "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">" << Qt::endl
+      << "<head>" << Qt::endl
+      << "  <title>" << title << "</title>" << Qt::endl
+      << "  <link href=\"classic.css\" rel=\"stylesheet\" type=\"text/css\" />" << Qt::endl
+      << "</head>" << Qt::endl
+      << "<body>" << Qt::endl;
 }
 
 static void writeDocumentFooter(QTextStream &s)
 {
-    s << "</body>" << endl
-      << "</html>" << endl;
+    s << "</body>" << Qt::endl
+      << "</html>" << Qt::endl;
 }
 
 static bool classLessThan(const AbstractMetaClass *c1, const AbstractMetaClass *c2)
@@ -107,10 +107,10 @@ void DocGenerator::generate()
 
         writeDocumentHeader(file.stream, package + " Package");
 
-        file.stream << "<h1 align=\"center\">" << package << " Package</h1>" << endl;
+        file.stream << "<h1 align=\"center\">" << package << " Package</h1>" << Qt::endl;
 
-        file.stream << "<h2>Classes</h2>" << endl
-                    << "<p><table width=\"100%\" class=\"annotated\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\">" << endl;
+        file.stream << "<h2>Classes</h2>" << Qt::endl
+                    << "<p><table width=\"100%\" class=\"annotated\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\">" << Qt::endl;
 
         for (int i = 0; i < classesInPackage.size(); ++i) {
             const AbstractMetaClass *cls = classesInPackage.at(i);
@@ -122,10 +122,10 @@ void DocGenerator::generate()
             else
                 file.stream << "even";
             file.stream << "\"><th><a href=\"" << fileNameForClass(cls) << "\">" << cls->name()
-                        << "</a></th></tr>" << endl;
+                        << "</a></th></tr>" << Qt::endl;
         }
 
-        file.stream << "</table></p>" << endl;
+        file.stream << "</table></p>" << Qt::endl;
 
         writeDocumentFooter(file.stream);
     }
@@ -136,8 +136,8 @@ void DocGenerator::generate()
 
         writeDocumentHeader(file.stream, "Classes");
 
-        file.stream << "<h1 align=\"center\">Classes</h1>" << endl
-                    << "<p><table width=\"100%\" class=\"annotated\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\">" << endl;
+        file.stream << "<h1 align=\"center\">Classes</h1>" << Qt::endl
+                    << "<p><table width=\"100%\" class=\"annotated\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\">" << Qt::endl;
 
         AbstractMetaClassList sortedClasses = m_classes;
         std::sort(sortedClasses.begin(), sortedClasses.end(), classLessThan);
@@ -152,10 +152,10 @@ void DocGenerator::generate()
             else
                 file.stream << "even";
             file.stream << "\"><th><a href=\"" << fileNameForClass(cls) << "\">" << cls->name()
-                        << "</a></th></tr>" << endl;
+                        << "</a></th></tr>" << Qt::endl;
         }
 
-        file.stream << "</table></p>" << endl;
+        file.stream << "</table></p>" << Qt::endl;
 
         writeDocumentFooter(file.stream);
     }
@@ -166,44 +166,44 @@ void DocGenerator::generate()
 
         writeDocumentHeader(file.stream, "Qt Bindings Reference Documentation");
 
-        file.stream << "<h1 align=\"center\">Qt Script Qt Bindings Reference Documentation</h1>" << endl;
+        file.stream << "<h1 align=\"center\">Qt Script Qt Bindings Reference Documentation</h1>" << Qt::endl;
 
-        file.stream << "<h3>Packages</h3>" << endl;
-        file.stream << "<ul>" << endl;
+        file.stream << "<h3>Packages</h3>" << Qt::endl;
+        file.stream << "<ul>" << Qt::endl;
         QStringList sortedPackages = packHash.keys();
         std::sort(sortedPackages.begin(), sortedPackages.end());
         for (int i = 0; i < sortedPackages.size(); ++i) {
             QString pkg = sortedPackages.at(i);
             file.stream << "<li><b><a href=\"" << pkg.split(".").join("_") << ".html\">"
-                        << pkg << "</a></b></li>" << endl;
+                        << pkg << "</a></b></li>" << Qt::endl;
         }
-        file.stream << "</ul>" << endl;
+        file.stream << "</ul>" << Qt::endl;
 
-        file.stream << "<h3><a href=\"classes.html\">All Classes</a></h3>" << endl;
+        file.stream << "<h3><a href=\"classes.html\">All Classes</a></h3>" << Qt::endl;
 
-        file.stream << "<h3><a href=\"../examples\">Examples</a></h3>" << endl;
+        file.stream << "<h3><a href=\"../examples\">Examples</a></h3>" << Qt::endl;
 
-        file.stream << "<h3>Getting Started</h3>" << endl
-                    << "<p>Using the Qt API in Qt Script is very similar to C++." << endl
-                    << "<pre>var f = new QFile(\"foo.txt\");</pre>" << endl
-                    << "C++ enum values are mapped to properties of the script constructor function; e.g. " << endl
-                    << "QIODevice::ReadOnly becomes QIODevice.ReadOnly.</p>" << endl
-                    << "<pre>f.open(new QIODevice.OpenMode(QIODevice.ReadOnly));</pre>" << endl
-                    << "<p>Each C++ flag type is mapped to a property of the script constructor function; e.g. " << endl
-                    << "QIODevice::OpenMode becomes QIODevice.OpenMode. Such a property is a constructor function " << endl
-                    << "that takes one or more enum values and constructs a flags instance by OR'ing the arguments " << endl
-                    << "together.</p>" << endl
-                    << "<pre>var ts = new QTextStream(f);" << endl
-                    << "ts.writeString(\"Boo\");</pre>" << endl
-                    << "<p>C++ streaming operators are normally mapped to readT() and writeT() functions.</p>" << endl
-                    << "<pre>f.close();</pre>" << endl
-                    << "<p>In Qt Script, all objects are allocated on the heap; objects that are no longer " << endl
-                    << "referenced are garbage collected sometime in the future; therefore, make sure to " << endl
-                    << "explicitly free up resources if you can. (Without the call to close(), the underlying " << endl
-                    << "file would remain open until the file object is garbage collected.)</p>" << endl
+        file.stream << "<h3>Getting Started</h3>" << Qt::endl
+                    << "<p>Using the Qt API in Qt Script is very similar to C++." << Qt::endl
+                    << "<pre>var f = new QFile(\"foo.txt\");</pre>" << Qt::endl
+                    << "C++ enum values are mapped to properties of the script constructor function; e.g. " << Qt::endl
+                    << "QIODevice::ReadOnly becomes QIODevice.ReadOnly.</p>" << Qt::endl
+                    << "<pre>f.open(new QIODevice.OpenMode(QIODevice.ReadOnly));</pre>" << Qt::endl
+                    << "<p>Each C++ flag type is mapped to a property of the script constructor function; e.g. " << Qt::endl
+                    << "QIODevice::OpenMode becomes QIODevice.OpenMode. Such a property is a constructor function " << Qt::endl
+                    << "that takes one or more enum values and constructs a flags instance by OR'ing the arguments " << Qt::endl
+                    << "together.</p>" << Qt::endl
+                    << "<pre>var ts = new QTextStream(f);" << Qt::endl
+                    << "ts.writeString(\"Boo\");</pre>" << Qt::endl
+                    << "<p>C++ streaming operators are normally mapped to readT() and writeT() functions.</p>" << Qt::endl
+                    << "<pre>f.close();</pre>" << Qt::endl
+                    << "<p>In Qt Script, all objects are allocated on the heap; objects that are no longer " << Qt::endl
+                    << "referenced are garbage collected sometime in the future; therefore, make sure to " << Qt::endl
+                    << "explicitly free up resources if you can. (Without the call to close(), the underlying " << Qt::endl
+                    << "file would remain open until the file object is garbage collected.)</p>" << Qt::endl
             ;
 
-        file.stream << "<h3><a href=\"http://doc.trolltech.com/latest\">Qt Reference Documentation</a></h3>" << endl;
+        file.stream << "<h3><a href=\"http://doc.trolltech.com/latest\">Qt Reference Documentation</a></h3>" << Qt::endl;
 
         writeDocumentFooter(file.stream);
     }
@@ -223,7 +223,7 @@ QList<int> uniqueEnumValueIndexes(const AbstractMetaEnumValueList &values);
 
 static void writeFunction(QTextStream &s, const AbstractMetaFunction *fun)
 {
-    s << "<li><div class=\"fn\"/><b>" << fun->targetLangSignature() << "</b></li>" << endl;
+    s << "<li><div class=\"fn\"/><b>" << fun->targetLangSignature() << "</b></li>" << Qt::endl;
 }
 
 void DocGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
@@ -237,23 +237,23 @@ void DocGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
     title.append(" Reference");
     writeDocumentHeader(s, title);
 
-    s << "<h1 align=\"center\">" << title << "</h1>" << endl;
+    s << "<h1 align=\"center\">" << title << "</h1>" << Qt::endl;
 
     s << "<h3 align=\"center\">[<a href=\"";
     s << meta_class->package().split(".").join("_") << ".html";
     s << "\">";
     s << meta_class->package();
-    s << "</a> package]</h3>" << endl;
+    s << "</a> package]</h3>" << Qt::endl;
 
     if (meta_class->baseClass()) {
         s << "<p>Inherits <a href=\"" << fileNameForClass(meta_class->baseClass()) << "\">"
-          << meta_class->baseClass()->name() << "</a>.</p>" << endl;
+          << meta_class->baseClass()->name() << "</a>.</p>" << Qt::endl;
     } else if (!meta_class->interfaces().isEmpty()) {
         AbstractMetaClass *iface = meta_class->interfaces().first();
         AbstractMetaClass *impl = iface->primaryInterfaceImplementor();
         if (impl != meta_class) {
             s << "<p>Inherits <a href=\"" << fileNameForClass(impl) << "\">"
-              << impl->name() << "</a>.</p>" << endl;
+              << impl->name() << "</a>.</p>" << Qt::endl;
         }
     }
 
@@ -265,20 +265,20 @@ void DocGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
     QMap<QString, AbstractMetaFunctionList> nameToStaticFunctions;
     findPrototypeAndStaticFunctions(meta_class, nameToPrototypeFunctions, nameToStaticFunctions);
 
-    s << "<h3>Constructor</h3>" << endl;
+    s << "<h3>Constructor</h3>" << Qt::endl;
     if (!ctors.isEmpty()) {
-        s << "<ul>" << endl;
+        s << "<ul>" << Qt::endl;
         for (int i = 0; i < ctors.size(); ++i) {
             writeFunction(s, ctors.at(i));
         }
-        s << "</ul>" << endl;
+        s << "</ul>" << Qt::endl;
     } else {
         s << "<p>This class has no public constructors. Calling the constructor function will cause a TypeError.</p>";
     }
 
-    s << "<h3>Constructor Properties</h3>" << endl;
-    s << "<ul>" << endl;
-    s << "<li><b>prototype</b>: The " << meta_class->name() << " prototype object</li>" << endl;
+    s << "<h3>Constructor Properties</h3>" << Qt::endl;
+    s << "<ul>" << Qt::endl;
+    s << "<li><b>prototype</b>: The " << meta_class->name() << " prototype object</li>" << Qt::endl;
     if (!nameToStaticFunctions.isEmpty()) {
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
         for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it) {
@@ -298,47 +298,47 @@ void DocGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
                 s << "<li><b>" << val->name();
                 if (!val->stringValue().isEmpty())
                     s << " = " << val->stringValue();
-                s << "</b></li>" << endl;
+                s << "</b></li>" << Qt::endl;
             }
-            s << "<li><b>" << enom->name() << "( value )</b></li>" << endl;
+            s << "<li><b>" << enom->name() << "( value )</b></li>" << Qt::endl;
             FlagsTypeEntry *flags = enom->typeEntry()->flags();
             if (flags)
-                s << "<li><b>" << flags->flagsName() << "( value1, value2, ... )</b></li>" << endl;
+                s << "<li><b>" << flags->flagsName() << "( value1, value2, ... )</b></li>" << Qt::endl;
         }
     }
-    s << "</ul>" << endl;
+    s << "</ul>" << Qt::endl;
 
     if (!nameToPrototypeFunctions.isEmpty()) {
-        s << "<h3>Prototype Object Properties</h3>" << endl;
+        s << "<h3>Prototype Object Properties</h3>" << Qt::endl;
         if (meta_class->baseClass()) {
             s << "<p>The " << meta_class->name() << " prototype object inherits properties from the "
               << "<a href=\"" << fileNameForClass(meta_class->baseClass()) << "\">"
               << meta_class->baseClass()->name() << "</a> prototype object and "
-              << "also has the following properties.</p>" << endl;
+              << "also has the following properties.</p>" << Qt::endl;
         }
-        s << "<ul>" << endl;
+        s << "<ul>" << Qt::endl;
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
         for (it = nameToPrototypeFunctions.constBegin(); it != nameToPrototypeFunctions.constEnd(); ++it) {
             writeFunction(s, it.value().first());
         }
-        s << "</ul>" << endl;
+        s << "</ul>" << Qt::endl;
     }
 
     if (!meta_class->isNamespace()) {
-        s << "<h3>Instance Properties</h3>" << endl;
+        s << "<h3>Instance Properties</h3>" << Qt::endl;
         {
             QList<QPropertySpec *> props = meta_class->propertySpecs();
             if (!props.isEmpty()) {
                 s << "<p>" << meta_class->name() << " objects inherit properties from the "
-                  << meta_class->name() << " prototype object and also have the following properties.</p>" << endl;
-                s << "<ul>" << endl;
+                  << meta_class->name() << " prototype object and also have the following properties.</p>" << Qt::endl;
+                s << "<ul>" << Qt::endl;
                 for (int i = 0; i < props.size(); ++i) {
-                    s << "<li><div class=\"fn\"/><b>" << props.at(i)->name() << "</b></li>" << endl;
+                    s << "<li><div class=\"fn\"/><b>" << props.at(i)->name() << "</b></li>" << Qt::endl;
                 }
-                s << "</ul>" << endl;
+                s << "</ul>" << Qt::endl;
             } else {
                 s << "<p>" << meta_class->name() << " objects have no special properties beyond those "
-                  << "inherited from the " << meta_class->name() << " prototype object.</p>" << endl;
+                  << "inherited from the " << meta_class->name() << " prototype object.</p>" << Qt::endl;
             }
         }
     }

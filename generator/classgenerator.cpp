@@ -221,7 +221,7 @@ static void writeInjectedCode(QTextStream &s, const AbstractMetaClass *meta_clas
     CodeSnipList code_snips = meta_class->typeEntry()->codeSnips();
     foreach (const CodeSnip &cs, code_snips) {
         if ((cs.language == TypeSystem::NativeCode) && (cs.position == pos)) {
-            s << cs.code() << endl;
+            s << cs.code() << Qt::endl;
         }
     }
 }
@@ -239,7 +239,7 @@ static void writeInjectedCode(QTextStream &s, const AbstractMetaClass *meta_clas
             continue;
         foreach (const CodeSnip &cs, mod.snips) {
             if ((cs.language == TypeSystem::NativeCode) && (cs.position == pos)) {
-                s << cs.code() << endl;
+                s << cs.code() << Qt::endl;
             }
         }
     }
@@ -259,7 +259,7 @@ static void writeArgumentTypeTests(QTextStream &stream, const AbstractMetaFuncti
         if (fun->argumentRemoved(j+1))
             continue;
         if (i > 0)
-            stream << endl << indentStr << "&& ";
+            stream << Qt::endl << indentStr << "&& ";
         const AbstractMetaType *argType = 0;
         QString typeName = fun->typeReplaced(j+1);
         if (typeName.isEmpty()) {
@@ -358,7 +358,7 @@ static int writePrepareArguments(QTextStream &stream, const AbstractMetaFunction
             // ### generalize the QSet check (we should check if the type has push_back())
             bool useToSequence = argType && isSequenceType(argType) && !argType->name().startsWith("Set");
             if (useToSequence) {
-                stream << ";" << endl;
+                stream << ";" << Qt::endl;
                 stream << indentStr << "qScriptValueToSequence(";
             } else {
                 stream << " = ";
@@ -381,7 +381,7 @@ static int writePrepareArguments(QTextStream &stream, const AbstractMetaFunction
                     stream << "." << converter << "()";
                 }
             }
-            stream << ";" << endl;
+            stream << ";" << Qt::endl;
         }
         if (!fun->argumentRemoved(j+1))
             ++scriptArgIndex;
@@ -439,7 +439,7 @@ static void writeConstructorCallAndReturn(QTextStream &stream, const AbstractMet
         writeArguments(stream, nativeArgc);
         stream << ")";
     }
-    stream << ";" << endl;
+    stream << ";" << Qt::endl;
 
     stream << indentStr << "QScriptValue _q_result = context->engine()->new";
     if (isQObjectBased(meta_class))
@@ -460,19 +460,19 @@ static void writeConstructorCallAndReturn(QTextStream &stream, const AbstractMet
         stream << ", QScriptEngine::AutoOwnership";
     else
         stream << ")";
-    stream << ");" << endl;
+    stream << ");" << Qt::endl;
     if (meta_class->generateShellClass()) {
         stream << indentStr << "_q_cpp_result";
         if (useNew)
             stream << "->";
         else
             stream << ".";
-        stream << "__qtscript_self = _q_result;" << endl;
+        stream << "__qtscript_self = _q_result;" << Qt::endl;
     }
 
     writeInjectedCode(stream, meta_class, fun, CodeSnip::End);
 
-    stream << indentStr << "return _q_result;" << endl;
+    stream << indentStr << "return _q_result;" << Qt::endl;
 }
 
 /*!
@@ -544,7 +544,7 @@ static void writeFunctionCallAndReturn(QTextStream &stream, const AbstractMetaFu
     writeArguments(stream, nativeArgc);
     if (constCastResult)
         stream << ")";
-    stream << ");" << endl;
+    stream << ");" << Qt::endl;
 
     writeInjectedCode(stream, meta_class, fun, CodeSnip::End);
 
@@ -575,7 +575,7 @@ static void writeFunctionCallAndReturn(QTextStream &stream, const AbstractMetaFu
             }
         }
     }
-    stream << endl;
+    stream << Qt::endl;
 }
 
 /*!
@@ -601,14 +601,14 @@ static void writeStreamingOperatorCall(QTextStream &stream, const AbstractMetaFu
     QString indentStr(indent, QLatin1Char(' '));
     QString streamClassName = fun->arguments().at(0)->type()->name();
     stream << indentStr << streamClassName << "* _q_arg0 = qscriptvalue_cast<"
-           << streamClassName << "*>(context->argument(0));" << endl;
+           << streamClassName << "*>(context->argument(0));" << Qt::endl;
     stream << indentStr << "operator";
     if (fun->modifiedName() == "readFrom")
         stream << ">>";
     else
         stream << "<<";
-    stream << "(*_q_arg0, *_q_self);" << endl;
-    stream << indentStr << "return context->engine()->undefinedValue();" << endl;
+    stream << "(*_q_arg0, *_q_self);" << Qt::endl;
+    stream << indentStr << "return context->engine()->undefinedValue();" << Qt::endl;
 }
 
 /*!
@@ -619,23 +619,23 @@ static void writeConstructorForwarding(QTextStream &stream,
                                        const AbstractMetaClass *meta_class)
 {
 #if 0
-    stream << "/** signatures:" << endl;
+    stream << "/** signatures:" << Qt::endl;
     foreach (const AbstractMetaFunction *fun, functions) {
-        stream << " *     " << fun->signature() << endl;
+        stream << " *     " << fun->signature() << Qt::endl;
     }
-    stream << " */" << endl;
+    stream << " */" << Qt::endl;
 #endif
 
     if (/*meta_class->isAbstract() ||*/ (functions.size() == 0)) {
-        stream << "    return context->throwError(QScriptContext::TypeError," << endl
+        stream << "    return context->throwError(QScriptContext::TypeError," << Qt::endl
                << "        QString::fromLatin1(\"" << meta_class->name()
-               << " cannot be constructed\"));" << endl;
+               << " cannot be constructed\"));" << Qt::endl;
 
     } else {
-        stream << "    if (context->thisObject().strictlyEquals(context->engine()->globalObject())) {" << endl
+        stream << "    if (context->thisObject().strictlyEquals(context->engine()->globalObject())) {" << Qt::endl
                << "        return context->throwError(QString::fromLatin1(\""
-               << meta_class->name() << "(): Did you forget to construct with 'new'?\"));" << endl
-               << "    }" << endl;
+               << meta_class->name() << "(): Did you forget to construct with 'new'?\"));" << Qt::endl
+               << "    }" << Qt::endl;
 
         writeInjectedCode(stream, meta_class, CodeSnip::Constructor);
 
@@ -654,7 +654,7 @@ static void writeConstructorForwarding(QTextStream &stream,
             else
                 stream << "    ";
             needElse = true;
-            stream << "if (context->argumentCount() == " << i << ") {" << endl;
+            stream << "if (context->argumentCount() == " << i << ") {" << Qt::endl;
             if ((funcs.size() == 1) || (i == 0)) {
                 AbstractMetaFunction *fun = funcs.at(0);
                 const int indent = 8;
@@ -670,14 +670,14 @@ static void writeConstructorForwarding(QTextStream &stream,
                     AbstractMetaArgumentList arguments = fun->arguments();
                     const int indent = 12;
                     writeArgumentTypeTests(stream, fun, arguments, i, indent);
-                    stream << ") {" << endl;
+                    stream << ") {" << Qt::endl;
                     writeConstructorCallAndReturn(stream, fun, i, meta_class, indent);
                 }
-                stream << "        }" << endl;
+                stream << "        }" << Qt::endl;
             }
             stream << "    }";
         }
-        stream << endl;
+        stream << Qt::endl;
 //        writeThrowAmbiguityError(stream, meta_class, 0, signatures.toList());
     }
 }
@@ -714,39 +714,39 @@ static bool isContiguousEnum(const QList<int> &indexes, const AbstractMetaEnumVa
 
 static void writeCreateEnumClassHelper(QTextStream &stream)
 {
-    stream << "static QScriptValue qtscript_create_enum_class_helper(" << endl
-           << "    QScriptEngine *engine," << endl
-           << "    QScriptEngine::FunctionSignature construct," << endl
-           << "    QScriptEngine::FunctionSignature valueOf," << endl
-           << "    QScriptEngine::FunctionSignature toString)" << endl
-           << "{" << endl
-           << "    QScriptValue proto = engine->newObject();" << endl
-           << "    proto.setProperty(QString::fromLatin1(\"valueOf\")," << endl
-           << "        engine->newFunction(valueOf), QScriptValue::SkipInEnumeration);" << endl
-           << "    proto.setProperty(QString::fromLatin1(\"toString\")," << endl
-           << "        engine->newFunction(toString), QScriptValue::SkipInEnumeration);" << endl
-           << "    return engine->newFunction(construct, proto, 1);" << endl
-           << "}" << endl << endl;
+    stream << "static QScriptValue qtscript_create_enum_class_helper(" << Qt::endl
+           << "    QScriptEngine *engine," << Qt::endl
+           << "    QScriptEngine::FunctionSignature construct," << Qt::endl
+           << "    QScriptEngine::FunctionSignature valueOf," << Qt::endl
+           << "    QScriptEngine::FunctionSignature toString)" << Qt::endl
+           << "{" << Qt::endl
+           << "    QScriptValue proto = engine->newObject();" << Qt::endl
+           << "    proto.setProperty(QString::fromLatin1(\"valueOf\")," << Qt::endl
+           << "        engine->newFunction(valueOf), QScriptValue::SkipInEnumeration);" << Qt::endl
+           << "    proto.setProperty(QString::fromLatin1(\"toString\")," << Qt::endl
+           << "        engine->newFunction(toString), QScriptValue::SkipInEnumeration);" << Qt::endl
+           << "    return engine->newFunction(construct, proto, 1);" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 }
 
 static void writeCreateFlagsClassHelper(QTextStream &stream)
 {
-    stream << "static QScriptValue qtscript_create_flags_class_helper(" << endl
-           << "    QScriptEngine *engine," << endl
-           << "    QScriptEngine::FunctionSignature construct," << endl
-           << "    QScriptEngine::FunctionSignature valueOf," << endl
-           << "    QScriptEngine::FunctionSignature toString," << endl
-           << "    QScriptEngine::FunctionSignature equals)" << endl
-           << "{" << endl
-           << "    QScriptValue proto = engine->newObject();" << endl
-           << "    proto.setProperty(QString::fromLatin1(\"valueOf\")," << endl
-           << "        engine->newFunction(valueOf), QScriptValue::SkipInEnumeration);" << endl
-           << "    proto.setProperty(QString::fromLatin1(\"toString\")," << endl
-           << "        engine->newFunction(toString), QScriptValue::SkipInEnumeration);" << endl
-           << "    proto.setProperty(QString::fromLatin1(\"equals\")," << endl
-           << "        engine->newFunction(equals), QScriptValue::SkipInEnumeration);" << endl
-           << "    return engine->newFunction(construct, proto);" << endl
-           << "}" << endl << endl;
+    stream << "static QScriptValue qtscript_create_flags_class_helper(" << Qt::endl
+           << "    QScriptEngine *engine," << Qt::endl
+           << "    QScriptEngine::FunctionSignature construct," << Qt::endl
+           << "    QScriptEngine::FunctionSignature valueOf," << Qt::endl
+           << "    QScriptEngine::FunctionSignature toString," << Qt::endl
+           << "    QScriptEngine::FunctionSignature equals)" << Qt::endl
+           << "{" << Qt::endl
+           << "    QScriptValue proto = engine->newObject();" << Qt::endl
+           << "    proto.setProperty(QString::fromLatin1(\"valueOf\")," << Qt::endl
+           << "        engine->newFunction(valueOf), QScriptValue::SkipInEnumeration);" << Qt::endl
+           << "    proto.setProperty(QString::fromLatin1(\"toString\")," << Qt::endl
+           << "        engine->newFunction(toString), QScriptValue::SkipInEnumeration);" << Qt::endl
+           << "    proto.setProperty(QString::fromLatin1(\"equals\")," << Qt::endl
+           << "        engine->newFunction(equals), QScriptValue::SkipInEnumeration);" << Qt::endl
+           << "    return engine->newFunction(construct, proto);" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 }
 
 /*!
@@ -762,9 +762,9 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
     QString qualifiedEnumName = qualifiedCppNameColons + enom->name();
     QString qtScriptEnumName = meta_class->name() + "_" + enom->name();
 
-    stream << "//" << endl;
-    stream << "// " << qualifiedEnumName << endl;
-    stream << "//" << endl << endl;
+    stream << "//" << Qt::endl;
+    stream << "// " << qualifiedEnumName << Qt::endl;
+    stream << "//" << Qt::endl << Qt::endl;
 
     // determine unique values (aliases will cause switch statement to not compile)
     AbstractMetaEnumValueList values = enom->values();
@@ -774,157 +774,157 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
 
     // write arrays of values and keys
     stream << "static const " << qualifiedEnumName
-           << " qtscript_" << qtScriptEnumName << "_values[] = {" << endl;
+           << " qtscript_" << qtScriptEnumName << "_values[] = {" << Qt::endl;
     for (int i = 0; i < uniqueIndexes.size(); ++i) {
         stream << "    ";
         if (i > 0)
             stream << ", ";
-        stream << qualifiedCppNameColons << values.at(uniqueIndexes.at(i))->name() << endl;
+        stream << qualifiedCppNameColons << values.at(uniqueIndexes.at(i))->name() << Qt::endl;
     }
-    stream << "};" << endl << endl;
-    stream << "static const char * const qtscript_" << qtScriptEnumName << "_keys[] = {" << endl;
+    stream << "};" << Qt::endl << Qt::endl;
+    stream << "static const char * const qtscript_" << qtScriptEnumName << "_keys[] = {" << Qt::endl;
     for (int i = 0; i < uniqueIndexes.size(); ++i) {
         stream << "    ";
         if (i > 0)
             stream << ", ";
-        stream << "\"" << values.at(uniqueIndexes.at(i))->name() << "\"" << endl;
+        stream << "\"" << values.at(uniqueIndexes.at(i))->name() << "\"" << Qt::endl;
     }
-    stream << "};" << endl << endl;
+    stream << "};" << Qt::endl << Qt::endl;
 
     // write toString helper
     stream << "static QString qtscript_"
            << qtScriptEnumName << "_toStringHelper"
-           << "(" << qualifiedEnumName << " value)" << endl;
-    stream << "{" << endl;
+           << "(" << qualifiedEnumName << " value)" << Qt::endl;
+    stream << "{" << Qt::endl;
     if (enom->hasQEnumsDeclaration() && (meta_class->qualifiedCppName() != "QTransform")) {
-        stream << "    const QMetaObject *meta = qtscript_" << meta_class->name() << "_metaObject();" << endl;
-        stream << "    int idx = meta->indexOfEnumerator(\"" << enom->name() << "\");" << endl;
-        stream << "    Q_ASSERT(idx != -1);" << endl;
-        stream << "    QMetaEnum menum = meta->enumerator(idx);" << endl;
-        stream << "    return QString::fromLatin1(menum.valueToKey(value));" << endl;
+        stream << "    const QMetaObject *meta = qtscript_" << meta_class->name() << "_metaObject();" << Qt::endl;
+        stream << "    int idx = meta->indexOfEnumerator(\"" << enom->name() << "\");" << Qt::endl;
+        stream << "    Q_ASSERT(idx != -1);" << Qt::endl;
+        stream << "    QMetaEnum menum = meta->enumerator(idx);" << Qt::endl;
+        stream << "    return QString::fromLatin1(menum.valueToKey(value));" << Qt::endl;
     } else {
         if (contiguous) {
             stream << "    if ((value >= " << qualifiedCppNameColons
                    << values.at(uniqueIndexes.first())->name() << ")"
                    << " && (value <= " << qualifiedCppNameColons
-                   << values.at(uniqueIndexes.last())->name() << "))" << endl
+                   << values.at(uniqueIndexes.last())->name() << "))" << Qt::endl
                    << "        return qtscript_" << qtScriptEnumName
                    << "_keys[static_cast<int>(value)-static_cast<int>("
                    << qualifiedCppNameColons
-                   << values.at(uniqueIndexes.first())->name() << ")];" << endl;
+                   << values.at(uniqueIndexes.first())->name() << ")];" << Qt::endl;
         } else {
-            stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << endl
-                   << "        if (qtscript_" << qtScriptEnumName << "_values[i] == value)" << endl
-                   << "            return QString::fromLatin1(qtscript_" << qtScriptEnumName << "_keys[i]);" << endl
-                   << "    }" << endl;
+            stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << Qt::endl
+                   << "        if (qtscript_" << qtScriptEnumName << "_values[i] == value)" << Qt::endl
+                   << "            return QString::fromLatin1(qtscript_" << qtScriptEnumName << "_keys[i]);" << Qt::endl
+                   << "    }" << Qt::endl;
         }
-        stream << "    return QString();" << endl;
+        stream << "    return QString();" << Qt::endl;
     }
-    stream << "}" << endl << endl;
+    stream << "}" << Qt::endl << Qt::endl;
 
     // write QScriptValue <--> C++ conversion functions
     stream << "static QScriptValue qtscript_"
            << qtScriptEnumName << "_toScriptValue("
-           << "QScriptEngine *engine, const " << qualifiedEnumName << " &value)" << endl
-           << "{" << endl
+           << "QScriptEngine *engine, const " << qualifiedEnumName << " &value)" << Qt::endl
+           << "{" << Qt::endl
            << "    QScriptValue clazz = engine->globalObject().property(QString::fromLatin1(\""
-           << meta_class->name() << "\"));" << endl
+           << meta_class->name() << "\"));" << Qt::endl
 //           << "    QScriptValue enumClazz = clazz.property(QString::fromLatin1(\""
-//           << enom->name() << "\"));" << endl
-           << "    return clazz.property(qtscript_" << qtScriptEnumName << "_toStringHelper(value));" << endl
-           << "}" << endl << endl;
+//           << enom->name() << "\"));" << Qt::endl
+           << "    return clazz.property(qtscript_" << qtScriptEnumName << "_toStringHelper(value));" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
     stream << "static void qtscript_"
            << qtScriptEnumName << "_fromScriptValue("
-           << "const QScriptValue &value, " << qualifiedEnumName << " &out)" << endl
-           << "{" << endl
-           << "    out = qvariant_cast<" << qualifiedEnumName << ">(value.toVariant());" << endl
-           << "}" << endl << endl;
+           << "const QScriptValue &value, " << qualifiedEnumName << " &out)" << Qt::endl
+           << "{" << Qt::endl
+           << "    out = qvariant_cast<" << qualifiedEnumName << ">(value.toVariant());" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 
     // write constructor
     stream << "static QScriptValue qtscript_construct_"
            << qtScriptEnumName
-           << "(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
-    stream << "    int arg = context->argument(0).toInt32();" << endl;
+           << "(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
+    stream << "    int arg = context->argument(0).toInt32();" << Qt::endl;
     if (enom->hasQEnumsDeclaration() && (meta_class->qualifiedCppName() != "QTransform")) {
-        stream << "    const QMetaObject *meta = qtscript_" << meta_class->name() << "_metaObject();" << endl;
-        stream << "    int idx = meta->indexOfEnumerator(\"" << enom->name() << "\");" << endl;
-        stream << "    Q_ASSERT(idx != -1);" << endl;
-        stream << "    QMetaEnum menum = meta->enumerator(idx);" << endl;
-        stream << "    if (menum.valueToKey(arg) != 0)" << endl;
+        stream << "    const QMetaObject *meta = qtscript_" << meta_class->name() << "_metaObject();" << Qt::endl;
+        stream << "    int idx = meta->indexOfEnumerator(\"" << enom->name() << "\");" << Qt::endl;
+        stream << "    Q_ASSERT(idx != -1);" << Qt::endl;
+        stream << "    QMetaEnum menum = meta->enumerator(idx);" << Qt::endl;
+        stream << "    if (menum.valueToKey(arg) != 0)" << Qt::endl;
         stream << "        return qScriptValueFromValue(engine,  static_cast<"
-               << qualifiedEnumName << ">(arg));" << endl;
+               << qualifiedEnumName << ">(arg));" << Qt::endl;
     } else {
         if (contiguous) {
             stream << "    if ((arg >= " << qualifiedCppNameColons
                    << values.at(uniqueIndexes.first())->name() << ")"
                    << " && (arg <= " << qualifiedCppNameColons
-                   << values.at(uniqueIndexes.last())->name() << "))" << endl;
+                   << values.at(uniqueIndexes.last())->name() << "))" << Qt::endl;
             stream << "        return qScriptValueFromValue(engine,  static_cast<"
-                   << qualifiedEnumName << ">(arg));" << endl;
+                   << qualifiedEnumName << ">(arg));" << Qt::endl;
         } else {
-            stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << endl
-                   << "        if (qtscript_" << qtScriptEnumName << "_values[i] == arg)" << endl;
+            stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << Qt::endl
+                   << "        if (qtscript_" << qtScriptEnumName << "_values[i] == arg)" << Qt::endl;
             stream << "            return qScriptValueFromValue(engine,  static_cast<"
-                   << qualifiedEnumName << ">(arg));" << endl;
-            stream << "    }" << endl;
+                   << qualifiedEnumName << ">(arg));" << Qt::endl;
+            stream << "    }" << Qt::endl;
         }
     }
     stream << "    return context->throwError(QString::fromLatin1(\""
-           << enom->name() << "(): invalid enum value (%0)\").arg(arg));" << endl;
-    stream << "}" << endl;
-    stream << endl;
+           << enom->name() << "(): invalid enum value (%0)\").arg(arg));" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write prototype.valueOf()
     stream << "static QScriptValue qtscript_" << qtScriptEnumName
-           << "_valueOf(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
+           << "_valueOf(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
     stream << "    " << qualifiedEnumName << " value = "
            << "qscriptvalue_cast<" << qualifiedEnumName
-           << ">(context->thisObject());" << endl;
-    stream << "    return QScriptValue(engine, static_cast<int>(value));" << endl;
-    stream << "}" << endl;
-    stream << endl;
+           << ">(context->thisObject());" << Qt::endl;
+    stream << "    return QScriptValue(engine, static_cast<int>(value));" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write prototype.toString()
     stream << "static QScriptValue qtscript_" << qtScriptEnumName
-           << "_toString(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
+           << "_toString(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
     stream << "    " << qualifiedEnumName << " value = "
            << "qscriptvalue_cast<" << qualifiedEnumName
-           << ">(context->thisObject());" << endl;
-    stream << "    return QScriptValue(engine, qtscript_" << qtScriptEnumName << "_toStringHelper(value));" << endl;
-    stream << "}" << endl;
-    stream << endl;
+           << ">(context->thisObject());" << Qt::endl;
+    stream << "    return QScriptValue(engine, qtscript_" << qtScriptEnumName << "_toStringHelper(value));" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write class creation function
     stream << "static QScriptValue qtscript_create_"
            << qtScriptEnumName
-           << "_class(QScriptEngine *engine, QScriptValue &clazz)" << endl;
-    stream << "{" << endl;
+           << "_class(QScriptEngine *engine, QScriptValue &clazz)" << Qt::endl;
+    stream << "{" << Qt::endl;
 
-    stream << "    QScriptValue ctor = qtscript_create_enum_class_helper(" << endl
-           << "        engine, qtscript_construct_" << qtScriptEnumName << "," << endl
+    stream << "    QScriptValue ctor = qtscript_create_enum_class_helper(" << Qt::endl
+           << "        engine, qtscript_construct_" << qtScriptEnumName << "," << Qt::endl
            << "        qtscript_" << qtScriptEnumName << "_valueOf, qtscript_"
-           << qtScriptEnumName << "_toString);" << endl;
+           << qtScriptEnumName << "_toString);" << Qt::endl;
 
     stream << "    qScriptRegisterMetaType<" << qualifiedEnumName << ">(engine, "
-           << "qtscript_" << qtScriptEnumName << "_toScriptValue," << endl
+           << "qtscript_" << qtScriptEnumName << "_toScriptValue," << Qt::endl
            << "        qtscript_" << qtScriptEnumName << "_fromScriptValue,"
-           << " ctor.property(QString::fromLatin1(\"prototype\")));" << endl;
+           << " ctor.property(QString::fromLatin1(\"prototype\")));" << Qt::endl;
 
     // enum values are properties of the constructor
-    stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << endl
+    stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << Qt::endl
            << "        clazz.setProperty(QString::fromLatin1(qtscript_"
-           << qtScriptEnumName << "_keys[i])," << endl
+           << qtScriptEnumName << "_keys[i])," << Qt::endl
            << "            engine->newVariant(QVariant::fromValue(qtscript_"
-           << qtScriptEnumName << "_values[i]))," << endl
-           << "            QScriptValue::ReadOnly | QScriptValue::Undeletable);" << endl
-           << "    }" << endl;
+           << qtScriptEnumName << "_values[i]))," << Qt::endl
+           << "            QScriptValue::ReadOnly | QScriptValue::Undeletable);" << Qt::endl
+           << "    }" << Qt::endl;
 
-    stream << "    return ctor;" << endl;
-    stream << "}" << endl;
-    stream << endl;
+    stream << "    return ctor;" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write flags class too, if any
     FlagsTypeEntry *flags = enom->typeEntry()->flags();
@@ -934,113 +934,113 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
     QString qualifiedFlagsName = qualifiedCppNameColons + flags->targetLangName();
     QString qtScriptFlagsName = meta_class->name() + "_" + flags->targetLangName();
 
-    stream << "//" << endl;
-    stream << "// " << qualifiedFlagsName << endl;
-    stream << "//" << endl << endl;
+    stream << "//" << Qt::endl;
+    stream << "// " << qualifiedFlagsName << Qt::endl;
+    stream << "//" << Qt::endl << Qt::endl;
 
     // write QScriptValue <--> C++ conversion functions
     stream << "static QScriptValue qtscript_"
            << qtScriptFlagsName << "_toScriptValue("
-           << "QScriptEngine *engine, const " << qualifiedFlagsName << " &value)" << endl
-           << "{" << endl
-           << "    return engine->newVariant(QVariant::fromValue(value));" << endl
-           << "}" << endl << endl;
+           << "QScriptEngine *engine, const " << qualifiedFlagsName << " &value)" << Qt::endl
+           << "{" << Qt::endl
+           << "    return engine->newVariant(QVariant::fromValue(value));" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
     stream << "static void qtscript_"
            << qtScriptFlagsName << "_fromScriptValue("
-           << "const QScriptValue &value, " << qualifiedFlagsName << " &out)" << endl
-           << "{" << endl
-           << "    QVariant var = value.toVariant();" << endl
-           << "    if (var.userType() == qMetaTypeId<" << qualifiedFlagsName << ">())" << endl
-           << "        out = qvariant_cast<" << qualifiedFlagsName << ">(var);" << endl
-           << "    else if (var.userType() == qMetaTypeId<" << qualifiedEnumName << ">())" << endl
-           << "        out = qvariant_cast<" << qualifiedEnumName << ">(var);" << endl
-           << "    else" << endl
-           << "        out = " << qualifiedFlagsName << "();" << endl
-           << "}" << endl << endl;
+           << "const QScriptValue &value, " << qualifiedFlagsName << " &out)" << Qt::endl
+           << "{" << Qt::endl
+           << "    QVariant var = value.toVariant();" << Qt::endl
+           << "    if (var.userType() == qMetaTypeId<" << qualifiedFlagsName << ">())" << Qt::endl
+           << "        out = qvariant_cast<" << qualifiedFlagsName << ">(var);" << Qt::endl
+           << "    else if (var.userType() == qMetaTypeId<" << qualifiedEnumName << ">())" << Qt::endl
+           << "        out = qvariant_cast<" << qualifiedEnumName << ">(var);" << Qt::endl
+           << "    else" << Qt::endl
+           << "        out = " << qualifiedFlagsName << "();" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 
     // write constructor
     stream << "static QScriptValue qtscript_construct_"
            << qtScriptFlagsName
-           << "(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
-    stream << "    " << qualifiedFlagsName << " result;" << endl;
-    stream << "    if ((context->argumentCount() == 1) && context->argument(0).isNumber()) {" << endl;
-    stream << "        result = static_cast<" << qualifiedFlagsName << ">(context->argument(0).toInt32());" << endl;
-    stream << "    } else {" << endl;
-    stream << "        for (int i = 0; i < context->argumentCount(); ++i) {" << endl;
-    stream << "            QVariant v = context->argument(i).toVariant();" << endl;
-    stream << "            if (v.userType() != qMetaTypeId<" << qualifiedEnumName << ">()) {" << endl;
-    stream << "                return context->throwError(QScriptContext::TypeError," << endl
+           << "(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
+    stream << "    " << qualifiedFlagsName << " result;" << Qt::endl;
+    stream << "    if ((context->argumentCount() == 1) && context->argument(0).isNumber()) {" << Qt::endl;
+    stream << "        result = static_cast<" << qualifiedFlagsName << ">(context->argument(0).toInt32());" << Qt::endl;
+    stream << "    } else {" << Qt::endl;
+    stream << "        for (int i = 0; i < context->argumentCount(); ++i) {" << Qt::endl;
+    stream << "            QVariant v = context->argument(i).toVariant();" << Qt::endl;
+    stream << "            if (v.userType() != qMetaTypeId<" << qualifiedEnumName << ">()) {" << Qt::endl;
+    stream << "                return context->throwError(QScriptContext::TypeError," << Qt::endl
            << "                    QString::fromLatin1(\"" << flags->targetLangName()
-           << "(): argument %0 is not of type " << enom->name() << "\").arg(i));" << endl;
-    stream << "            }" << endl;
+           << "(): argument %0 is not of type " << enom->name() << "\").arg(i));" << Qt::endl;
+    stream << "            }" << Qt::endl;
     stream << "            result |= qvariant_cast<" << qualifiedEnumName
-           << ">(v);" << endl;
-    stream << "        }" << endl;
-    stream << "   }" << endl;
-    stream << "    return engine->newVariant(QVariant::fromValue(result));" << endl;
-    stream << "}" << endl;
-    stream << endl;
+           << ">(v);" << Qt::endl;
+    stream << "        }" << Qt::endl;
+    stream << "   }" << Qt::endl;
+    stream << "    return engine->newVariant(QVariant::fromValue(result));" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write prototype.valueOf()
     stream << "static QScriptValue qtscript_" << qtScriptFlagsName
-           << "_valueOf(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
+           << "_valueOf(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
     stream << "    " << qualifiedFlagsName << " value = "
            << "qscriptvalue_cast<" << qualifiedFlagsName
-           << ">(context->thisObject());" << endl;
-    stream << "    return QScriptValue(engine, static_cast<int>(value));" << endl;
-    stream << "}" << endl;
-    stream << endl;
+           << ">(context->thisObject());" << Qt::endl;
+    stream << "    return QScriptValue(engine, static_cast<int>(value));" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 
     // write prototype.toString()
     stream << "static QScriptValue qtscript_" << qtScriptFlagsName
-           << "_toString(QScriptContext *context, QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
+           << "_toString(QScriptContext *context, QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
     stream << "    " << qualifiedFlagsName << " value = "
            << "qscriptvalue_cast<" << qualifiedFlagsName
-           << ">(context->thisObject());" << endl;
-    stream << "    QString result;" << endl;
-    stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << endl
+           << ">(context->thisObject());" << Qt::endl;
+    stream << "    QString result;" << Qt::endl;
+    stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << Qt::endl
            << "        if ((value & qtscript_" << qtScriptEnumName << "_values[i])"
-           << " == qtscript_" << qtScriptEnumName << "_values[i]) {" << endl
-           << "            if (!result.isEmpty())" << endl
-           << "                result.append(QString::fromLatin1(\",\"));" << endl
-           << "            result.append(QString::fromLatin1(qtscript_" << qtScriptEnumName << "_keys[i]));" << endl
-           << "        }" << endl
-           << "    }" << endl
-           << "    return QScriptValue(engine, result);" << endl
-           << "}" << endl
-           << endl;
+           << " == qtscript_" << qtScriptEnumName << "_values[i]) {" << Qt::endl
+           << "            if (!result.isEmpty())" << Qt::endl
+           << "                result.append(QString::fromLatin1(\",\"));" << Qt::endl
+           << "            result.append(QString::fromLatin1(qtscript_" << qtScriptEnumName << "_keys[i]));" << Qt::endl
+           << "        }" << Qt::endl
+           << "    }" << Qt::endl
+           << "    return QScriptValue(engine, result);" << Qt::endl
+           << "}" << Qt::endl
+           << Qt::endl;
 
     // write prototype.equals()
     stream << "static QScriptValue qtscript_" << qtScriptFlagsName
-           << "_equals(QScriptContext *context, QScriptEngine *engine)" << endl
-           << "{" << endl
-           << "    QVariant thisObj = context->thisObject().toVariant();" << endl
-           << "    QVariant otherObj = context->argument(0).toVariant();" << endl
+           << "_equals(QScriptContext *context, QScriptEngine *engine)" << Qt::endl
+           << "{" << Qt::endl
+           << "    QVariant thisObj = context->thisObject().toVariant();" << Qt::endl
+           << "    QVariant otherObj = context->argument(0).toVariant();" << Qt::endl
 
-           << "    return QScriptValue(engine, ((thisObj.userType() == otherObj.userType()) &&" << endl
-           << "                                 (thisObj.value<" << qualifiedFlagsName << ">() == otherObj.value<" << qualifiedFlagsName << ">())));" << endl
-           << "}" << endl << endl;
+           << "    return QScriptValue(engine, ((thisObj.userType() == otherObj.userType()) &&" << Qt::endl
+           << "                                 (thisObj.value<" << qualifiedFlagsName << ">() == otherObj.value<" << qualifiedFlagsName << ">())));" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 
     // write class creation function
-    stream << "static QScriptValue qtscript_create_" << qtScriptFlagsName << "_class(QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
-    stream << "    QScriptValue ctor = qtscript_create_flags_class_helper(" << endl
+    stream << "static QScriptValue qtscript_create_" << qtScriptFlagsName << "_class(QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
+    stream << "    QScriptValue ctor = qtscript_create_flags_class_helper(" << Qt::endl
            << "        engine, qtscript_construct_" << qtScriptFlagsName
-           << ", qtscript_" << qtScriptFlagsName << "_valueOf," << endl
+           << ", qtscript_" << qtScriptFlagsName << "_valueOf," << Qt::endl
            << "        qtscript_" << qtScriptFlagsName << "_toString, qtscript_"
-           << qtScriptFlagsName << "_equals);" << endl;
+           << qtScriptFlagsName << "_equals);" << Qt::endl;
 
     stream << "    qScriptRegisterMetaType<" << qualifiedFlagsName << ">(engine, "
-           << "qtscript_" << qtScriptFlagsName << "_toScriptValue," << endl
+           << "qtscript_" << qtScriptFlagsName << "_toScriptValue," << Qt::endl
            << "        qtscript_" << qtScriptFlagsName << "_fromScriptValue,"
-           << " ctor.property(QString::fromLatin1(\"prototype\")));" << endl;
+           << " ctor.property(QString::fromLatin1(\"prototype\")));" << Qt::endl;
 
-    stream << "    return ctor;" << endl;
-    stream << "}" << endl;
-    stream << endl;
+    stream << "    return ctor;" << Qt::endl;
+    stream << "}" << Qt::endl;
+    stream << Qt::endl;
 }
 
 /*!
@@ -1069,26 +1069,26 @@ void maybeDeclareMetaType(QTextStream &stream, const QString &typeName,
     if (name.contains(QLatin1Char(','))) {
         // need to expand the Q_DECLARE_METATYPE macro manually,
         // otherwise the compiler will choke
-        stream << "template <>" << endl
-               << "struct QMetaTypeId< " << name << " >" << endl
-               << "{" << endl
-               << "    enum { Defined = 1 };" << endl
-               << "    static int qt_metatype_id()" << endl
-               << "    {" << endl
-               << "        static QBasicAtomicInt metatype_id = Q_BASIC_ATOMIC_INITIALIZER(0);" << endl
-               << "#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)" << endl
-               << "        if (!metatype_id.load())" << endl
-               << "            metatype_id.store(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << endl
-               << "        return metatype_id.load();" << endl
-               << "#else" << endl
-               << "        if (!metatype_id.loadRelaxed())" << endl
-               << "            metatype_id.storeRelaxed(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << endl
-               << "        return metatype_id.loadRelaxed();" << endl
-               << "#endif" << endl
-               << "    }" << endl
-               << "};" << endl;
+        stream << "template <>" << Qt::endl
+               << "struct QMetaTypeId< " << name << " >" << Qt::endl
+               << "{" << Qt::endl
+               << "    enum { Defined = 1 };" << Qt::endl
+               << "    static int qt_metatype_id()" << Qt::endl
+               << "    {" << Qt::endl
+               << "        static QBasicAtomicInt metatype_id = Q_BASIC_ATOMIC_INITIALIZER(0);" << Qt::endl
+               << "#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)" << Qt::endl
+               << "        if (!metatype_id.load())" << Qt::endl
+               << "            metatype_id.store(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << Qt::endl
+               << "        return metatype_id.load();" << Qt::endl
+               << "#else" << Qt::endl
+               << "        if (!metatype_id.loadRelaxed())" << Qt::endl
+               << "            metatype_id.storeRelaxed(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << Qt::endl
+               << "        return metatype_id.loadRelaxed();" << Qt::endl
+               << "#endif" << Qt::endl
+               << "    }" << Qt::endl
+               << "};" << Qt::endl;
     } else {
-        stream << "Q_DECLARE_METATYPE(" << name << ")" << endl;
+        stream << "Q_DECLARE_METATYPE(" << name << ")" << Qt::endl;
     }
     registeredTypeNames << nameFootPrint;
 }
@@ -1199,11 +1199,11 @@ static void writeFunctionForwarding(QTextStream &stream, const AbstractMetaClass
                                     const AbstractMetaFunctionList &functions)
 {
 #if 0
-    stream << "/** signatures:" << endl;
+    stream << "/** signatures:" << Qt::endl;
     foreach (const AbstractMetaFunction *fun, functions) {
-        stream << " *     " << fun->signature() << endl;
+        stream << " *     " << fun->signature() << Qt::endl;
     }
-    stream << " */" << endl;
+    stream << " */" << Qt::endl;
 #endif
     QMap<int, AbstractMetaFunctionList> argcToFunctions;
     argcToFunctions = createArgcToFunctionsMap(functions);
@@ -1214,7 +1214,7 @@ static void writeFunctionForwarding(QTextStream &stream, const AbstractMetaClass
         AbstractMetaFunctionList funcs = argcToFunctions.value(i);
         if (funcs.isEmpty())
             continue;
-        stream << "    if (context->argumentCount() == " << i << ") {" << endl;
+        stream << "    if (context->argumentCount() == " << i << ") {" << Qt::endl;
         if (funcs.size() == 1 || i == 0) {
             AbstractMetaFunction *fun = funcs.at(0);
             const int indent = 8;
@@ -1237,13 +1237,13 @@ static void writeFunctionForwarding(QTextStream &stream, const AbstractMetaClass
                 AbstractMetaArgumentList arguments = fun->arguments();
                 const int indent = 12;
                 writeArgumentTypeTests(stream, fun, arguments, i, indent);
-                stream << ") {" << endl;
+                stream << ") {" << Qt::endl;
                 writeFunctionCallAndReturn(stream, fun, i, meta_class, indent);
                 signatures.insert(fun->targetLangSignature());
             }
-            stream << "        }" << endl;
+            stream << "        }" << Qt::endl;
         }
-        stream << "    }" << endl;
+        stream << "    }" << Qt::endl;
     }
 }
 
@@ -1252,25 +1252,25 @@ static void writePrototypeCall(QTextStream &s, const AbstractMetaClass *meta_cla
                                int prototypeFunctionsOffset)
 {
     s << "static QScriptValue qtscript_" << meta_class->name()
-      << "_prototype_call(QScriptContext *context, QScriptEngine *)" << endl
-      << "{" << endl;
+      << "_prototype_call(QScriptContext *context, QScriptEngine *)" << Qt::endl
+      << "{" << Qt::endl;
 
-    s << "#if QT_VERSION > 0x040400" << endl;
+    s << "#if QT_VERSION > 0x040400" << Qt::endl;
 
-    s << "    Q_ASSERT(context->callee().isFunction());" << endl
-      << "    uint _id = context->callee().data().toUInt32();" << endl;
+    s << "    Q_ASSERT(context->callee().isFunction());" << Qt::endl
+      << "    uint _id = context->callee().data().toUInt32();" << Qt::endl;
 
-    s << "#else" << endl
-      << "    uint _id;" << endl
-      << "    if (context->callee().isFunction())" << endl
-      << "        _id = context->callee().data().toUInt32();" << endl
-      << "    else" << endl
-      << "        _id = 0xBABE0000 + " << nameToFunctions.size() << ";" << endl;
+    s << "#else" << Qt::endl
+      << "    uint _id;" << Qt::endl
+      << "    if (context->callee().isFunction())" << Qt::endl
+      << "        _id = context->callee().data().toUInt32();" << Qt::endl
+      << "    else" << Qt::endl
+      << "        _id = 0xBABE0000 + " << nameToFunctions.size() << ";" << Qt::endl;
 
-    s << "#endif" << endl;
+    s << "#endif" << Qt::endl;
 
-    s << "    Q_ASSERT((_id & 0xFFFF0000) == 0xBABE0000);" << endl
-      << "    _id &= 0x0000FFFF;" << endl;
+    s << "    Q_ASSERT((_id & 0xFFFF0000) == 0xBABE0000);" << Qt::endl
+      << "    _id &= 0x0000FFFF;" << Qt::endl;
 
     // cast the thisObject to C++ type
     s << "    ";
@@ -1289,56 +1289,56 @@ static void writePrototypeCall(QTextStream &s, const AbstractMetaClass *meta_cla
     if (meta_class->hasProtectedFunctions())
         s << ")";
 #endif
-    s << ";" << endl
-      << "    if (!_q_self) {" << endl
-      << "        return context->throwError(QScriptContext::TypeError," << endl
+    s << ";" << Qt::endl
+      << "    if (!_q_self) {" << Qt::endl
+      << "        return context->throwError(QScriptContext::TypeError," << Qt::endl
       << "            QString::fromLatin1(\"" << meta_class->name()
-      << ".%0(): this object is not a " << meta_class->name() << "\")" << endl
+      << ".%0(): this object is not a " << meta_class->name() << "\")" << Qt::endl
       << "            .arg(qtscript_" << meta_class->name()
-      << "_function_names[_id+" << prototypeFunctionsOffset <<"]));" << endl
-      << "    }" << endl << endl;
+      << "_function_names[_id+" << prototypeFunctionsOffset <<"]));" << Qt::endl
+      << "    }" << Qt::endl << Qt::endl;
 
-    s << "    switch (_id) {" << endl;
+    s << "    switch (_id) {" << Qt::endl;
 
     QMap<QString, AbstractMetaFunctionList>::const_iterator it;
     int index = 0;
     for (it = nameToFunctions.constBegin(); it != nameToFunctions.constEnd(); ++it) {
-        s << "    case " << index << ":" << endl;
+        s << "    case " << index << ":" << Qt::endl;
         writeFunctionForwarding(s, meta_class, it.value());
-        s << "    break;" << endl << endl;
+        s << "    break;" << Qt::endl << Qt::endl;
         ++index;
     }
 
     if (!meta_class->hasDefaultToStringFunction()) {
-        s << "    case " << index << ": {" << endl;
+        s << "    case " << index << ": {" << Qt::endl;
         s << "    QString result";
         FunctionModelItem fun = meta_class->hasToStringCapability();
         if (fun) {
             int indirections = fun->arguments().at(1)->type().indirections();
             QString deref = QLatin1String(indirections == 0 ? "*" : "");
-            s << ";" << endl
-              << "    QDebug d(&result);" << endl
-              << "    d << " << deref  << "_q_self;" << endl;
+            s << ";" << Qt::endl
+              << "    QDebug d(&result);" << Qt::endl
+              << "    d << " << deref  << "_q_self;" << Qt::endl;
         } else {
             // ### FIXME: can cause compile error
-//        s << "=QString(\"" << meta_class->name() << "(0x%1)\").arg((int)_q_self, 0, 16);" << endl;
-            s << " = QString::fromLatin1(\"" << meta_class->name() << "\");" << endl;
+//        s << "=QString(\"" << meta_class->name() << "(0x%1)\").arg((int)_q_self, 0, 16);" << Qt::endl;
+            s << " = QString::fromLatin1(\"" << meta_class->name() << "\");" << Qt::endl;
         }
-        s << "    return QScriptValue(context->engine(), result);" << endl
-          << "    }" << endl << endl;
+        s << "    return QScriptValue(context->engine(), result);" << Qt::endl
+          << "    }" << Qt::endl << Qt::endl;
     }
 
-    s << "    default:" << endl
-      << "    Q_ASSERT(false);" << endl
-      << "    }" << endl;
+    s << "    default:" << Qt::endl
+      << "    Q_ASSERT(false);" << Qt::endl
+      << "    }" << Qt::endl;
 
-    s << "    return qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(context," << endl
+    s << "    return qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(context," << Qt::endl
       << "        qtscript_" << meta_class->name()
-      << "_function_names[_id+" << prototypeFunctionsOffset << "]," << endl
+      << "_function_names[_id+" << prototypeFunctionsOffset << "]," << Qt::endl
       << "        qtscript_" << meta_class->name()
-      << "_function_signatures[_id+" << prototypeFunctionsOffset << "]);" << endl;
+      << "_function_signatures[_id+" << prototypeFunctionsOffset << "]);" << Qt::endl;
 
-    s << "}" << endl << endl;
+    s << "}" << Qt::endl << Qt::endl;
 }
 
 static void writeStaticCall(QTextStream &s, const AbstractMetaClass *meta_class,
@@ -1346,37 +1346,37 @@ static void writeStaticCall(QTextStream &s, const AbstractMetaClass *meta_class,
                             const QMap<QString, AbstractMetaFunctionList> &nameToFunctions)
 {
     s << "static QScriptValue qtscript_" << meta_class->name()
-      << "_static_call(QScriptContext *context, QScriptEngine *)" << endl
-      << "{" << endl;
+      << "_static_call(QScriptContext *context, QScriptEngine *)" << Qt::endl
+      << "{" << Qt::endl;
 
-    s << "    uint _id = context->callee().data().toUInt32();" << endl
-      << "    Q_ASSERT((_id & 0xFFFF0000) == 0xBABE0000);" << endl
-      << "    _id &= 0x0000FFFF;" << endl;
+    s << "    uint _id = context->callee().data().toUInt32();" << Qt::endl
+      << "    Q_ASSERT((_id & 0xFFFF0000) == 0xBABE0000);" << Qt::endl
+      << "    _id &= 0x0000FFFF;" << Qt::endl;
 
-    s << "    switch (_id) {" << endl;
+    s << "    switch (_id) {" << Qt::endl;
 
-    s << "    case 0:" << endl;
+    s << "    case 0:" << Qt::endl;
     writeConstructorForwarding(s, constructors, meta_class);
-    s << "    break;" << endl << endl;
+    s << "    break;" << Qt::endl << Qt::endl;
 
     QMap<QString, AbstractMetaFunctionList>::const_iterator it;
     int index = 1;
     for (it = nameToFunctions.constBegin(); it != nameToFunctions.constEnd(); ++it) {
-        s << "    case " << index << ":" << endl;
+        s << "    case " << index << ":" << Qt::endl;
         writeFunctionForwarding(s, meta_class, it.value());
-        s << "    break;" << endl << endl;
+        s << "    break;" << Qt::endl << Qt::endl;
         ++index;
     }
 
-    s << "    default:" << endl
-      << "    Q_ASSERT(false);" << endl
-      << "    }" << endl;
+    s << "    default:" << Qt::endl
+      << "    Q_ASSERT(false);" << Qt::endl
+      << "    }" << Qt::endl;
 
-    s << "    return qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(context," << endl
-      << "        qtscript_" << meta_class->name() << "_function_names[_id]," << endl
-      << "        qtscript_" << meta_class->name() << "_function_signatures[_id]);" << endl;
+    s << "    return qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(context," << Qt::endl
+      << "        qtscript_" << meta_class->name() << "_function_names[_id]," << Qt::endl
+      << "        qtscript_" << meta_class->name() << "_function_signatures[_id]);" << Qt::endl;
 
-    s << "}" << endl << endl;
+    s << "}" << Qt::endl << Qt::endl;
 }
 
 /*!
@@ -1398,50 +1398,50 @@ void writeInclude(QTextStream &stream, const Include &inc)
         stream << ">";
     else
         stream << "\"";
-    stream << endl;
+    stream << Qt::endl;
 }
 
 static void writeHelperFunctions(QTextStream &stream, const AbstractMetaClass *meta_class)
 {
-    stream << "static QScriptValue qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(" << endl
-           << "    QScriptContext *context, const char *functionName, const char *signatures)" << endl
-           << "{" << endl
-           << "    QStringList lines = QString::fromLatin1(signatures).split(QLatin1Char('\\n'));" << endl
-           << "    QStringList fullSignatures;" << endl
-           << "    for (int i = 0; i < lines.size(); ++i)" << endl
-           << "        fullSignatures.append(QString::fromLatin1(\"%0(%1)\").arg(functionName).arg(lines.at(i)));" << endl
+    stream << "static QScriptValue qtscript_" << meta_class->name() << "_throw_ambiguity_error_helper(" << Qt::endl
+           << "    QScriptContext *context, const char *functionName, const char *signatures)" << Qt::endl
+           << "{" << Qt::endl
+           << "    QStringList lines = QString::fromLatin1(signatures).split(QLatin1Char('\\n'));" << Qt::endl
+           << "    QStringList fullSignatures;" << Qt::endl
+           << "    for (int i = 0; i < lines.size(); ++i)" << Qt::endl
+           << "        fullSignatures.append(QString::fromLatin1(\"%0(%1)\").arg(functionName).arg(lines.at(i)));" << Qt::endl
            << "    return context->throwError(QString::fromLatin1(\"" << meta_class->name()
-           << "::%0(): could not find a function match; candidates are:\\n%1\")" << endl
-           << "        .arg(functionName).arg(fullSignatures.join(QLatin1String(\"\\n\"))));" << endl
-           << "}" << endl << endl;
+           << "::%0(): could not find a function match; candidates are:\\n%1\")" << Qt::endl
+           << "        .arg(functionName).arg(fullSignatures.join(QLatin1String(\"\\n\"))));" << Qt::endl
+           << "}" << Qt::endl << Qt::endl;
 }
 
 void writeQtScriptQtBindingsLicense(QTextStream &stream)
 {
     stream
-        << "/****************************************************************************" << endl
-        << "**" << endl
-        << "** Copyright (C) 2008 Trolltech ASA. All rights reserved." << endl
-        << "**" << endl
-        << "** This file is part of the Qt Script Qt Bindings project on Trolltech Labs." << endl
-        << "**" << endl
-        << "** This file may be used under the terms of the GNU General Public" << endl
-        << "** License version 2.0 as published by the Free Software Foundation" << endl
-        << "** and appearing in the file LICENSE.GPL included in the packaging of" << endl
-        << "** this file.  Please review the following information to ensure GNU" << endl
-        << "** General Public Licensing requirements will be met:" << endl
-        << "** http://www.trolltech.com/products/qt/opensource.html" << endl
-        << "**" << endl
-        << "** If you are unsure which license is appropriate for your use, please" << endl
-        << "** review the following information:" << endl
-        << "** http://www.trolltech.com/products/qt/licensing.html or contact the" << endl
-        << "** sales department at sales@trolltech.com." << endl
-        << "**" << endl
-        << "** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE" << endl
-        << "** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE." << endl
-        << "**" << endl
-        << "****************************************************************************/" << endl
-        << endl;
+        << "/****************************************************************************" << Qt::endl
+        << "**" << Qt::endl
+        << "** Copyright (C) 2008 Trolltech ASA. All rights reserved." << Qt::endl
+        << "**" << Qt::endl
+        << "** This file is part of the Qt Script Qt Bindings project on Trolltech Labs." << Qt::endl
+        << "**" << Qt::endl
+        << "** This file may be used under the terms of the GNU General Public" << Qt::endl
+        << "** License version 2.0 as published by the Free Software Foundation" << Qt::endl
+        << "** and appearing in the file LICENSE.GPL included in the packaging of" << Qt::endl
+        << "** this file.  Please review the following information to ensure GNU" << Qt::endl
+        << "** General Public Licensing requirements will be met:" << Qt::endl
+        << "** http://www.trolltech.com/products/qt/opensource.html" << Qt::endl
+        << "**" << Qt::endl
+        << "** If you are unsure which license is appropriate for your use, please" << Qt::endl
+        << "** review the following information:" << Qt::endl
+        << "** http://www.trolltech.com/products/qt/licensing.html or contact the" << Qt::endl
+        << "** sales department at sales@trolltech.com." << Qt::endl
+        << "**" << Qt::endl
+        << "** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE" << Qt::endl
+        << "** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE." << Qt::endl
+        << "**" << Qt::endl
+        << "****************************************************************************/" << Qt::endl
+        << Qt::endl;
 }
 
 /*!
@@ -1502,15 +1502,15 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
         writeQtScriptQtBindingsLicense(stream);
 
     // write common includes
-    stream << "#include <QtScript/QScriptEngine>" << endl;
-    stream << "#include <QtScript/QScriptContext>" << endl;
-    stream << "#include <QtScript/QScriptValue>" << endl;
-    stream << "#include <QtCore/QStringList>" << endl;
-    stream << "#include <QtCore/QDebug>" << endl;
-    stream << "#include <qmetaobject.h>" << endl;
+    stream << "#include <QtScript/QScriptEngine>" << Qt::endl;
+    stream << "#include <QtScript/QScriptContext>" << Qt::endl;
+    stream << "#include <QtScript/QScriptValue>" << Qt::endl;
+    stream << "#include <QtCore/QStringList>" << Qt::endl;
+    stream << "#include <QtCore/QDebug>" << Qt::endl;
+    stream << "#include <qmetaobject.h>" << Qt::endl;
 
-    stream << "#include <__package_shared.h>" << endl;
-    stream << endl;
+    stream << "#include <__package_shared.h>" << Qt::endl;
+    stream << Qt::endl;
 
     // write class-specific includes
     {
@@ -1525,11 +1525,11 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
             writeInclude(stream, i);
         }
     }
-    stream << endl;
+    stream << Qt::endl;
 
     if (meta_class->generateShellClass()) {
-        stream << "#include \"qtscriptshell_" << meta_class->name() << ".h\"" << endl;
-        stream << endl;
+        stream << "#include \"qtscriptshell_" << meta_class->name() << ".h\"" << Qt::endl;
+        stream << Qt::endl;
     }
 
     AbstractMetaEnumList enums = meta_class->enums();
@@ -1555,12 +1555,12 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
             writeInclude(stream, i);
         }
 
-        stream << endl;
+        stream << Qt::endl;
     }
 
     if (meta_class->name() == "Global") {
-            stream << "class Global {};" << endl;
-            stream << endl;
+            stream << "class Global {};" << Qt::endl;
+            stream << Qt::endl;
     }
 
     // find constructors
@@ -1577,78 +1577,78 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
 
     // write table of function names
     stream << "static const char * const qtscript_"
-           << meta_class->name() << "_function_names[] = {" << endl;
-    stream << "    \"" << meta_class->name() << "\"" << endl;
+           << meta_class->name() << "_function_names[] = {" << Qt::endl;
+    stream << "    \"" << meta_class->name() << "\"" << Qt::endl;
     {
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
-        stream << "    // static" << endl;
+        stream << "    // static" << Qt::endl;
         for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it) {
             stream << "    , ";
-            stream << "\"" << it.key() << "\"" << endl;
+            stream << "\"" << it.key() << "\"" << Qt::endl;
         }
-        stream << "    // prototype" << endl;
+        stream << "    // prototype" << Qt::endl;
         for (it = nameToPrototypeFunctions.constBegin(); it != nameToPrototypeFunctions.constEnd(); ++it) {
             QString functionName = it.key();
             QString scriptName = functionName;
             if (functionName == QLatin1String("operator_equal"))
                 scriptName = QLatin1String("equals");
             stream << "    , ";
-            stream << "\"" << scriptName << "\"" << endl;
+            stream << "\"" << scriptName << "\"" << Qt::endl;
         }
         if (!meta_class->hasDefaultToStringFunction())
-            stream << "    , \"toString\"" << endl;
+            stream << "    , \"toString\"" << Qt::endl;
     }
-    stream << "};" << endl << endl;
+    stream << "};" << Qt::endl << Qt::endl;
 
     // write table of function signatures
     stream << "static const char * const qtscript_"
-           << meta_class->name() << "_function_signatures[] = {" << endl;
+           << meta_class->name() << "_function_signatures[] = {" << Qt::endl;
     stream << "    ";
     writeFunctionSignaturesString(stream, ctors);
-    stream << endl;
+    stream << Qt::endl;
     {
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
-        stream << "    // static" << endl;
+        stream << "    // static" << Qt::endl;
         for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it) {
             stream << "    , ";
             writeFunctionSignaturesString(stream, it.value());
-            stream << endl;
+            stream << Qt::endl;
         }
-        stream << "    // prototype" << endl;
+        stream << "    // prototype" << Qt::endl;
         for (it = nameToPrototypeFunctions.constBegin(); it != nameToPrototypeFunctions.constEnd(); ++it) {
             stream << "    , ";
             writeFunctionSignaturesString(stream, it.value());
-            stream << endl;
+            stream << Qt::endl;
         }
         if (!meta_class->hasDefaultToStringFunction())
-            stream << "\"\"" << endl;
+            stream << "\"\"" << Qt::endl;
     }
-    stream << "};" << endl << endl;
+    stream << "};" << Qt::endl << Qt::endl;
 
     // write table of function lengths
-    stream << "static const int qtscript_" << meta_class->name() << "_function_lengths[] = {" << endl;
-    stream << "    " << maxFunctionLength(ctors) << endl;
+    stream << "static const int qtscript_" << meta_class->name() << "_function_lengths[] = {" << Qt::endl;
+    stream << "    " << maxFunctionLength(ctors) << Qt::endl;
     {
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
-        stream << "    // static" << endl;
+        stream << "    // static" << Qt::endl;
         for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it) {
-            stream << "    , " << maxFunctionLength(it.value()) << endl;
+            stream << "    , " << maxFunctionLength(it.value()) << Qt::endl;
         }
-        stream << "    // prototype" << endl;
+        stream << "    // prototype" << Qt::endl;
         for (it = nameToPrototypeFunctions.constBegin(); it != nameToPrototypeFunctions.constEnd(); ++it) {
-            stream << "    , " << maxFunctionLength(it.value()) << endl;
+            stream << "    , " << maxFunctionLength(it.value()) << Qt::endl;
         }
         if (!meta_class->hasDefaultToStringFunction())
-            stream << "    , 0" << endl;
+            stream << "    , 0" << Qt::endl;
     }
-    stream << "};" << endl << endl;
+    stream << "};" << Qt::endl << Qt::endl;
 
 #ifndef GENERATOR_NO_PROTECTED_FUNCTIONS
     if (meta_class->hasProtectedFunctions()) {
         // write a friendly class
         stream << "class qtscript_" << meta_class->name()
-               << " : public " << meta_class->qualifiedCppName() << endl;
-        stream << "{" << endl;
+               << " : public " << meta_class->qualifiedCppName() << Qt::endl;
+        stream << "{" << Qt::endl;
         for (int x = 0; x < 2; ++x) {
             QMap<QString, AbstractMetaFunctionList> &map =
                 x ? nameToStaticFunctions : nameToPrototypeFunctions;
@@ -1661,14 +1661,14 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
                                << "_" << it.key();
                         if (functions.at(i)->isStatic())
                             stream << "_static";
-                        stream << "(QScriptContext *, QScriptEngine *);" << endl;
+                        stream << "(QScriptContext *, QScriptEngine *);" << Qt::endl;
                         break;
                     }
                 }
             }
         }
-        stream << "};" << endl;
-        stream << endl;
+        stream << "};" << Qt::endl;
+        stream << Qt::endl;
     }
 #endif
 
@@ -1677,21 +1677,21 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     // write metaobject getter if we need it
     if (hasQEnums(enums) && (meta_class->qualifiedCppName() != "QTransform")) {
         if (meta_class->qualifiedCppName() == "Qt") {
-            stream << "struct qtscript_Qt_metaObject_helper : private QObject" << endl
-                   << "{" << endl
-                   << "    static const QMetaObject *get()" << endl
-                   << "    { return &static_cast<qtscript_Qt_metaObject_helper*>(0)->staticQtMetaObject; }" << endl
-                   << "};" << endl << endl;
+            stream << "struct qtscript_Qt_metaObject_helper : private QObject" << Qt::endl
+                   << "{" << Qt::endl
+                   << "    static const QMetaObject *get()" << Qt::endl
+                   << "    { return &static_cast<qtscript_Qt_metaObject_helper*>(0)->staticQtMetaObject; }" << Qt::endl
+                   << "};" << Qt::endl << Qt::endl;
         }
-        stream << "static const QMetaObject *qtscript_" << meta_class->name() << "_metaObject()" << endl
-               << "{" << endl
+        stream << "static const QMetaObject *qtscript_" << meta_class->name() << "_metaObject()" << Qt::endl
+               << "{" << Qt::endl
                << "    return ";
         if (meta_class->qualifiedCppName() == "Qt")
             stream << "qtscript_Qt_metaObject_helper::get()";
         else
             stream << "&" << meta_class->qualifiedCppName() << "::staticMetaObject";
-        stream << ";" << endl
-               << "}" << endl << endl;
+        stream << ";" << Qt::endl
+               << "}" << Qt::endl << Qt::endl;
     }
 
     // write metatype declarations
@@ -1741,7 +1741,7 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
         if (meta_class->name().endsWith("Gradient"))
             maybeDeclareMetaType(stream, "QGradient", registeredTypeNames);
 
-        stream << endl;
+        stream << Qt::endl;
     }
 
     writeInjectedCode(stream, meta_class, CodeSnip::Beginning);
@@ -1758,9 +1758,9 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
         }
     }
 
-    stream << "//" << endl;
-    stream << "// " << meta_class->name() << endl;
-    stream << "//" << endl << endl;
+    stream << "//" << Qt::endl;
+    stream << "// " << meta_class->name() << Qt::endl;
+    stream << "//" << Qt::endl << Qt::endl;
 
     if (!meta_class->isNamespace()) {
         if (!nameToPrototypeFunctions.isEmpty() /* || !meta_class->hasDefaultToStringFunction() */)
@@ -1772,34 +1772,34 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     if (isQObjectBased(meta_class)) {
         // write C++ <--> script conversion functions
         stream << "static QScriptValue qtscript_" << meta_class->name() << "_toScriptValue(QScriptEngine *engine, "
-               << meta_class->qualifiedCppName() << "* const &in)" << endl
-               << "{" << endl
-               << "    return engine->newQObject(in, QScriptEngine::QtOwnership, QScriptEngine::PreferExistingWrapperObject);" << endl
-               << "}" << endl << endl;
+               << meta_class->qualifiedCppName() << "* const &in)" << Qt::endl
+               << "{" << Qt::endl
+               << "    return engine->newQObject(in, QScriptEngine::QtOwnership, QScriptEngine::PreferExistingWrapperObject);" << Qt::endl
+               << "}" << Qt::endl << Qt::endl;
         stream << "static void qtscript_" << meta_class->name() << "_fromScriptValue(const QScriptValue &value, "
-               << meta_class->qualifiedCppName() << "* &out)" << endl
-               << "{" << endl
-               << "    out = qobject_cast<" << meta_class->qualifiedCppName() << "*>(value.toQObject());" << endl
-               << "}" << endl << endl;
+               << meta_class->qualifiedCppName() << "* &out)" << Qt::endl
+               << "{" << Qt::endl
+               << "    out = qobject_cast<" << meta_class->qualifiedCppName() << "*>(value.toQObject());" << Qt::endl
+               << "}" << Qt::endl << Qt::endl;
     }
 
     //
     // write exported function that creates the QtScript class
     //
     stream << "QScriptValue qtscript_create_" << meta_class->name()
-           << "_class(QScriptEngine *engine)" << endl;
-    stream << "{" << endl;
+           << "_class(QScriptEngine *engine)" << Qt::endl;
+    stream << "{" << Qt::endl;
 
     // setup prototype
     if (!meta_class->isNamespace()) {
         stream << "    engine->setDefaultPrototype(qMetaTypeId<"
-               << meta_class->qualifiedCppName() << "*>(), QScriptValue());" << endl;
+               << meta_class->qualifiedCppName() << "*>(), QScriptValue());" << Qt::endl;
         stream << "    QScriptValue proto = engine->newVariant(QVariant::fromValue(("
-               << meta_class->qualifiedCppName() << "*)0));" << endl;
+               << meta_class->qualifiedCppName() << "*)0));" << Qt::endl;
         bool havePrototypePrototype = false;
         if (meta_class->baseClass() != 0) {
             stream << "    proto.setPrototype(engine->defaultPrototype(qMetaTypeId<"
-                   << meta_class->baseClass()->qualifiedCppName() << "*>()));" << endl;
+                   << meta_class->baseClass()->qualifiedCppName() << "*>()));" << Qt::endl;
             havePrototypePrototype = true;
         }
         foreach (AbstractMetaClass *iface, meta_class->interfaces()) {
@@ -1808,94 +1808,94 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
                 continue;
             if (!havePrototypePrototype) {
                 stream << "    proto.setPrototype(engine->defaultPrototype(qMetaTypeId<"
-                       << impl->qualifiedCppName() << "*>()));" << endl;
+                       << impl->qualifiedCppName() << "*>()));" << Qt::endl;
                 havePrototypePrototype = true;
             } else {
                 // alternative would be to copy the properties from the secondary
                 // prototype to the primary prototype.
                 stream << "    proto.setProperty(QString::fromLatin1(\"__"
-                       << impl->name() << "__\")," << endl
+                       << impl->name() << "__\")," << Qt::endl
                        << "        engine->defaultPrototype(qMetaTypeId<"
-                       << impl->qualifiedCppName() << "*>())," << endl
-                       << "        QScriptValue::SkipInEnumeration);" << endl;
+                       << impl->qualifiedCppName() << "*>())," << Qt::endl
+                       << "        QScriptValue::SkipInEnumeration);" << Qt::endl;
             }
         }
         if (!nameToPrototypeFunctions.isEmpty()) {
             int count = nameToPrototypeFunctions.size();
             if (!meta_class->hasDefaultToStringFunction())
                 ++count;
-            stream << "    for (int i = 0; i < " << count << "; ++i) {" << endl
+            stream << "    for (int i = 0; i < " << count << "; ++i) {" << Qt::endl
                    << "        QScriptValue fun = engine->newFunction(qtscript_"
                    << meta_class->name() << "_prototype_call, qtscript_"
                    << meta_class->name() << "_function_lengths[i+"
-                   << prototypeFunctionsOffset << "]);" << endl
-                   << "        fun.setData(QScriptValue(engine, uint(0xBABE0000 + i)));" << endl
+                   << prototypeFunctionsOffset << "]);" << Qt::endl
+                   << "        fun.setData(QScriptValue(engine, uint(0xBABE0000 + i)));" << Qt::endl
                    << "        proto.setProperty(QString::fromLatin1(qtscript_"
-                   << meta_class->name() << "_function_names[i+" << prototypeFunctionsOffset << "])," << endl
-                   << "            fun, QScriptValue::SkipInEnumeration);" << endl
-                   << "    }" << endl;
+                   << meta_class->name() << "_function_names[i+" << prototypeFunctionsOffset << "])," << Qt::endl
+                   << "            fun, QScriptValue::SkipInEnumeration);" << Qt::endl
+                   << "    }" << Qt::endl;
         }
         writeInjectedCode(stream, meta_class, CodeSnip::PrototypeInitialization);
-        stream << endl;
+        stream << Qt::endl;
 
         // register the prototype
-//        stream << "    qDebug() << \"registering " << meta_class->name() << " prototype\";" << endl;
+//        stream << "    qDebug() << \"registering " << meta_class->name() << " prototype\";" << Qt::endl;
         if (meta_class->typeEntry()->isValue() && hasDefaultCtor) {
             stream << "    engine->setDefaultPrototype(qMetaTypeId<"
-                   << meta_class->qualifiedCppName() << ">(), proto);" << endl;
+                   << meta_class->qualifiedCppName() << ">(), proto);" << Qt::endl;
         }
         if (isQObjectBased(meta_class)) {
             stream << "    qScriptRegisterMetaType<" << meta_class->qualifiedCppName() << "*>(engine, qtscript_"
-                   << meta_class->name() << "_toScriptValue, " << endl << "        qtscript_"
-                   << meta_class->name() << "_fromScriptValue, proto);" << endl;
+                   << meta_class->name() << "_toScriptValue, " << Qt::endl << "        qtscript_"
+                   << meta_class->name() << "_fromScriptValue, proto);" << Qt::endl;
         } else {
             stream << "    engine->setDefaultPrototype(qMetaTypeId<"
-                   << meta_class->qualifiedCppName() << "*>(), proto);" << endl;
+                   << meta_class->qualifiedCppName() << "*>(), proto);" << Qt::endl;
         }
-        stream << endl;
+        stream << Qt::endl;
     } else {
-        stream << "    QScriptValue proto = QScriptValue();" << endl;
+        stream << "    QScriptValue proto = QScriptValue();" << Qt::endl;
     }
 
     // setup constructor
     stream << "    QScriptValue ctor = engine->newFunction(qtscript_" << meta_class->name()
-           << "_static_call, proto, qtscript_" << meta_class->name() << "_function_lengths[0]);" << endl;
-    stream << "    ctor.setData(QScriptValue(engine, uint(0xBABE0000 + 0)));" << endl;
+           << "_static_call, proto, qtscript_" << meta_class->name() << "_function_lengths[0]);" << Qt::endl;
+    stream << "    ctor.setData(QScriptValue(engine, uint(0xBABE0000 + 0)));" << Qt::endl;
     if (!nameToStaticFunctions.isEmpty()) {
         // static functions
-        stream << "    for (int i = 0; i < " << nameToStaticFunctions.size() << "; ++i) {" << endl
+        stream << "    for (int i = 0; i < " << nameToStaticFunctions.size() << "; ++i) {" << Qt::endl
                << "        QScriptValue fun = engine->newFunction(qtscript_" << meta_class->name()
-               << "_static_call," << endl
-               << "            qtscript_" << meta_class->name() << "_function_lengths[i+" << staticFunctionsOffset << "]);" << endl
-               << "        fun.setData(QScriptValue(engine, uint(0xBABE0000 + i+1)));" << endl
+               << "_static_call," << Qt::endl
+               << "            qtscript_" << meta_class->name() << "_function_lengths[i+" << staticFunctionsOffset << "]);" << Qt::endl
+               << "        fun.setData(QScriptValue(engine, uint(0xBABE0000 + i+1)));" << Qt::endl
                << "        ctor.setProperty(QString::fromLatin1(qtscript_"
-               << meta_class->name() << "_function_names[i+" << staticFunctionsOffset << "])," << endl
-               << "            fun, QScriptValue::SkipInEnumeration);" << endl
-               << "    }" << endl;
+               << meta_class->name() << "_function_names[i+" << staticFunctionsOffset << "])," << Qt::endl
+               << "            fun, QScriptValue::SkipInEnumeration);" << Qt::endl
+               << "    }" << Qt::endl;
     }
-    stream << endl;
+    stream << Qt::endl;
     //   enums and flags classes
     {
         for (int i = 0; i < enums.size(); ++i) {
             const AbstractMetaEnum *enom = enums.at(i);
             stream << "    ctor.setProperty(QString::fromLatin1(\""
-                   << enom->name() << "\")," << endl
+                   << enom->name() << "\")," << Qt::endl
                    << "        qtscript_create_" << meta_class->name()
-                   << "_" << enom->name() << "_class(engine, ctor));" << endl;
+                   << "_" << enom->name() << "_class(engine, ctor));" << Qt::endl;
             FlagsTypeEntry *flags = enom->typeEntry()->flags();
             if (flags) {
                 stream << "    ctor.setProperty(QString::fromLatin1(\""
-                       << flags->targetLangName() << "\")," << endl
+                       << flags->targetLangName() << "\")," << Qt::endl
                        << "        qtscript_create_" << meta_class->name()
-                       << "_" << flags->targetLangName() << "_class(engine));" << endl;
+                       << "_" << flags->targetLangName() << "_class(engine));" << Qt::endl;
             }
         }
     }
 
     writeInjectedCode(stream, meta_class, CodeSnip::ConstructorInitialization);
 
-    stream << "    return ctor;" << endl;
-    stream << "}" << endl;
+    stream << "    return ctor;" << Qt::endl;
+    stream << "}" << Qt::endl;
 
     writeInjectedCode(stream, meta_class, CodeSnip::End);
 

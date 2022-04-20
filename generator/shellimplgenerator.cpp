@@ -59,8 +59,8 @@ static bool include_less_than(const Include &a, const Include &b)
 
 static void writeHelperCode(QTextStream &s, const AbstractMetaClass *)
 {
-    s << "#define QTSCRIPT_IS_GENERATED_FUNCTION(fun) ((fun.data().toUInt32() & 0xFFFF0000) == 0xBABE0000)" << endl;
-    s << endl;
+    s << "#define QTSCRIPT_IS_GENERATED_FUNCTION(fun) ((fun.data().toUInt32() & 0xFFFF0000) == 0xBABE0000)" << Qt::endl;
+    s << Qt::endl;
 }
 
 void writeQtScriptQtBindingsLicense(QTextStream &stream);
@@ -74,12 +74,12 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
 
     priGenerator->addSource(packName, fileNameForClass(meta_class));
 
-    s << "#include \"qtscriptshell_" << meta_class->name() << ".h\"" << endl << endl;
+    s << "#include \"qtscriptshell_" << meta_class->name() << ".h\"" << Qt::endl << Qt::endl;
 
     if (!meta_class->generateShellClass())
         return;
 
-    s << "#include <QtScript/QScriptEngine>" << endl;
+    s << "#include <QtScript/QScriptEngine>" << Qt::endl;
 
     IncludeList list = meta_class->typeEntry()->extraIncludes();
     std::sort(list.begin(), list.end(), include_less_than);
@@ -100,9 +100,9 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
         else
             s << ">";
 
-        s << endl;
+        s << Qt::endl;
     }
-    s << endl;
+    s << Qt::endl;
 
     writeHelperCode(s, meta_class);
 
@@ -121,14 +121,14 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
     {
         QSet<QString> registeredTypeNames = m_qmetatype_declared_typenames;
         declareFunctionMetaTypes(s, functions, registeredTypeNames);
-        s << endl;
+        s << Qt::endl;
     }
 
     // write constructors
     foreach (const AbstractMetaFunction *ctor, ctors) {
         s << "QtScriptShell_" << meta_class->name() << "::";
         writeFunctionSignature(s, ctor, 0, QString(), Option(OriginalName | ShowStatic));
-        s << endl;
+        s << Qt::endl;
         s << "    : " << meta_class->qualifiedCppName() << "(";
         AbstractMetaArgumentList args = ctor->arguments();
         for (int i = 0; i < args.size(); ++i) {
@@ -136,7 +136,7 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
                 s << ", ";
             s << args.at(i)->argumentName();
         }
-        s << ")" << " {}" << endl << endl;
+        s << ")" << " {}" << Qt::endl << Qt::endl;
     }
 
     // write destructor
@@ -144,7 +144,7 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
       << "~QtScriptShell_" << meta_class->name() << "()";
     if (!meta_class->destructorException().isEmpty())
         s << " " << meta_class->destructorException();
-    s << " {}" << endl << endl;
+    s << " {}" << Qt::endl << Qt::endl;
 
     // write member functions
     for (int i = 0; i < functions.size(); ++i) {
@@ -152,7 +152,7 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
         writeFunctionSignature(s, fun, meta_class, QString(),
                                Option(OriginalName | ShowStatic | UnderscoreSpaces),
                                "QtScriptShell_");
-        s << endl << "{" << endl;
+        s << Qt::endl << "{" << Qt::endl;
         QString scriptFunctionName = fun->name();
         {
             QPropertySpec *read = 0;
@@ -165,15 +165,15 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
             }
         }
         s << "    QScriptValue _q_function = __qtscript_self.property(\""
-          << scriptFunctionName << "\");" << endl;
-        s << "    if (!_q_function.isFunction() || QTSCRIPT_IS_GENERATED_FUNCTION(_q_function)" << endl
-          << "        || (__qtscript_self.propertyFlags(\"" << scriptFunctionName << "\") & QScriptValue::QObjectMember)) {" << endl;
+          << scriptFunctionName << "\");" << Qt::endl;
+        s << "    if (!_q_function.isFunction() || QTSCRIPT_IS_GENERATED_FUNCTION(_q_function)" << Qt::endl
+          << "        || (__qtscript_self.propertyFlags(\"" << scriptFunctionName << "\") & QScriptValue::QObjectMember)) {" << Qt::endl;
 
         AbstractMetaArgumentList args = fun->arguments();
         s << "        ";
         if (fun->isAbstract()) {
             s << "qFatal(\"" << meta_class->name() << "::" << fun->name()
-              << "() is abstract!\");" << endl;
+              << "() is abstract!\");" << Qt::endl;
         } else {
             // call the C++ implementation
             if (fun->type())
@@ -193,14 +193,14 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
                     s << ", ";
                 s << args.at(i)->argumentName();
             }
-            s << ");" << endl;
+            s << ");" << Qt::endl;
         }
 
-        s << "    } else {" << endl;
+        s << "    } else {" << Qt::endl;
 
         // call the script function
         if (args.size() > 0)
-            s << "        QScriptEngine *_q_engine = __qtscript_self.engine();" << endl;
+            s << "        QScriptEngine *_q_engine = __qtscript_self.engine();" << Qt::endl;
         s << "        ";
         if (fun->type()) {
             s << "return qscriptvalue_cast<";
@@ -209,13 +209,13 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
         }
         s << "_q_function.call(__qtscript_self";
         if (args.size() > 0) {
-            s << "," << endl;
+            s << "," << Qt::endl;
             s << "            QScriptValueList()";
             int i = 0;
             for (int j = 0; j < args.size(); ++j) {
                 if (fun->argumentRemoved(j+1))
                     continue;
-                s << endl << "            << ";
+                s << Qt::endl << "            << ";
                 s << "qScriptValueFromValue(_q_engine, ";
                 AbstractMetaType *atype = args.at(j)->type();
                 QString asig = atype->cppSignature();
@@ -232,11 +232,11 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
         s << ")";
         if (fun->type())
             s << ")";
-        s << ";" << endl;
+        s << ";" << Qt::endl;
 
-        s << "    }" << endl;
+        s << "    }" << Qt::endl;
 
-        s << "}" << endl << endl;
+        s << "}" << Qt::endl << Qt::endl;
     }
 }
 
@@ -245,7 +245,7 @@ void ShellImplGenerator::writeInjectedCode(QTextStream &s, const AbstractMetaCla
     CodeSnipList code_snips = meta_class->typeEntry()->codeSnips();
     foreach (const CodeSnip &cs, code_snips) {
         if (cs.language == TypeSystem::ShellCode) {
-            s << cs.code() << endl;
+            s << cs.code() << Qt::endl;
         }
     }
 }
