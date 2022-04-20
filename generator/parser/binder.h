@@ -113,7 +113,6 @@ private:
   CodeModel *_M_model;
   LocationManager &_M_location;
   TokenStream *_M_token_stream;
-  Control *_M_control;
 
   CodeModel::FunctionType _M_current_function_type;
   CodeModel::AccessPolicy _M_current_access;

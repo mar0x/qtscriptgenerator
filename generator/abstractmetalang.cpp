@@ -150,7 +150,7 @@ AbstractMetaFunction::~AbstractMetaFunction()
 bool AbstractMetaFunction::isModifiedRemoved(int types) const
 {
     FunctionModificationList mods = modifications(implementingClass());
-    foreach (FunctionModification mod, mods) {
+    foreach (const FunctionModification &mod, mods) {
         if (!mod.isRemoveModifier())
             continue;
 
@@ -191,7 +191,7 @@ bool AbstractMetaFunction::needsSuppressUncheckedWarning() const
 {
     for (int i=-1; i<=arguments().size(); ++i) {
         QList<ReferenceCount> referenceCounts = this->referenceCounts(implementingClass(), i);
-        foreach (ReferenceCount referenceCount, referenceCounts) {
+        foreach (const ReferenceCount &referenceCount, referenceCounts) {
             if (referenceCount.action != ReferenceCount::Set)
                 return true;
         }
@@ -387,9 +387,9 @@ QList<ReferenceCount> AbstractMetaFunction::referenceCounts(const AbstractMetaCl
     QList<ReferenceCount> returned;
 
     FunctionModificationList mods = this->modifications(cls);
-    foreach (FunctionModification mod, mods) {
-        QList<ArgumentModification> argument_mods = mod.argument_mods;
-        foreach (ArgumentModification argument_mod, argument_mods) {
+    foreach (const FunctionModification &mod, mods) {
+        const QList<ArgumentModification> &argument_mods = mod.argument_mods;
+        foreach (const ArgumentModification &argument_mod, argument_mods) {
             if (argument_mod.index != idx && idx != -2)
                 continue;
             returned += argument_mod.referenceCounts;
@@ -402,9 +402,9 @@ QList<ReferenceCount> AbstractMetaFunction::referenceCounts(const AbstractMetaCl
 QString AbstractMetaFunction::replacedDefaultExpression(const AbstractMetaClass *cls, int key) const
 {
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key
                 && !argument_modification.replaced_default_expression.isEmpty()) {
                 return argument_modification.replaced_default_expression;
@@ -418,9 +418,9 @@ QString AbstractMetaFunction::replacedDefaultExpression(const AbstractMetaClass 
 bool AbstractMetaFunction::removedDefaultExpression(const AbstractMetaClass *cls, int key) const
 {
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key
                 && argument_modification.removed_default_expression) {
                 return true;
@@ -435,9 +435,9 @@ bool AbstractMetaFunction::resetObjectAfterUse(int argument_idx) const
 {
     const AbstractMetaClass *cls = declaringClass();
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argumentModifications = modification.argument_mods;
-        foreach (ArgumentModification argumentModification, argumentModifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argumentModifications = modification.argument_mods;
+        foreach (const ArgumentModification &argumentModification, argumentModifications) {
             if (argumentModification.index == argument_idx && argumentModification.reset_after_use)
                 return true;
         }
@@ -456,9 +456,9 @@ QString AbstractMetaFunction::nullPointerDefaultValue(const AbstractMetaClass *m
 
     do {
         FunctionModificationList modifications = this->modifications(cls);
-        foreach (FunctionModification modification, modifications) {
-            QList<ArgumentModification> argument_modifications = modification.argument_mods;
-            foreach (ArgumentModification argument_modification, argument_modifications) {
+        foreach (const FunctionModification &modification, modifications) {
+            const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+            foreach (const ArgumentModification &argument_modification, argument_modifications) {
                 if (argument_modification.index == argument_idx
                     && argument_modification.no_null_pointers) {
                     return argument_modification.null_pointer_default_value;
@@ -481,9 +481,9 @@ bool AbstractMetaFunction::nullPointersDisabled(const AbstractMetaClass *mainCla
 
     do {
         FunctionModificationList modifications = this->modifications(cls);
-        foreach (FunctionModification modification, modifications) {
-            QList<ArgumentModification> argument_modifications = modification.argument_mods;
-            foreach (ArgumentModification argument_modification, argument_modifications) {
+        foreach (const FunctionModification &modification, modifications) {
+            const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+            foreach (const ArgumentModification &argument_modification, argument_modifications) {
                 if (argument_modification.index == argument_idx
                     && argument_modification.no_null_pointers) {
                     return true;
@@ -500,13 +500,13 @@ bool AbstractMetaFunction::nullPointersDisabled(const AbstractMetaClass *mainCla
 QString AbstractMetaFunction::conversionRule(TypeSystem::Language language, int key) const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index != key)
                 continue;
 
-            foreach (CodeSnip snip, argument_modification.conversion_rules) {
+            foreach (const CodeSnip &snip, argument_modification.conversion_rules) {
                 if (snip.language == language && !snip.code().isEmpty())
                     return snip.code();
             }
@@ -519,9 +519,9 @@ QString AbstractMetaFunction::conversionRule(TypeSystem::Language language, int 
 QString AbstractMetaFunction::argumentReplaced(int key) const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key && !argument_modification.replace_value.isEmpty()) {
                 return argument_modification.replace_value;
             }
@@ -534,9 +534,9 @@ QString AbstractMetaFunction::argumentReplaced(int key) const
 bool AbstractMetaFunction::argumentRemoved(int key) const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key) {
                 if (argument_modification.removed) {
                     return true;
@@ -551,7 +551,7 @@ bool AbstractMetaFunction::argumentRemoved(int key) const
 bool AbstractMetaFunction::isVirtualSlot() const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
+    foreach (const FunctionModification &modification, modifications) {
         if (modification.isVirtualSlot())
             return true;
     }
@@ -562,13 +562,13 @@ bool AbstractMetaFunction::isVirtualSlot() const
 bool AbstractMetaFunction::disabledGarbageCollection(const AbstractMetaClass *cls, int key) const
 {
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index != key)
                 continue;
 
-            foreach (TypeSystem::Ownership ownership, argument_modification.ownerships.values()) {
+            foreach (const TypeSystem::Ownership &ownership, argument_modification.ownerships.values()) {
                 if (ownership == TypeSystem::CppOwnership)
                     return true;
             }
@@ -582,7 +582,7 @@ bool AbstractMetaFunction::disabledGarbageCollection(const AbstractMetaClass *cl
 bool AbstractMetaFunction::isDeprecated() const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
+    foreach (const FunctionModification &modification, modifications) {
         if (modification.isDeprecated())
             return true;
     }
@@ -592,9 +592,9 @@ bool AbstractMetaFunction::isDeprecated() const
 TypeSystem::Ownership AbstractMetaFunction::ownership(const AbstractMetaClass *cls, TypeSystem::Language language, int key) const
 {
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key)
                 return argument_modification.ownerships.value(language, TypeSystem::InvalidOwnership);
         }
@@ -611,7 +611,7 @@ bool AbstractMetaFunction::isRemovedFromAllLanguages(const AbstractMetaClass *cl
 bool AbstractMetaFunction::isRemovedFrom(const AbstractMetaClass *cls, TypeSystem::Language language) const
 {
     FunctionModificationList modifications = this->modifications(cls);
-    foreach (FunctionModification modification, modifications) {
+    foreach (const FunctionModification &modification, modifications) {
         if ((modification.removal & language) == language)
             return true;
     }
@@ -623,9 +623,9 @@ bool AbstractMetaFunction::isRemovedFrom(const AbstractMetaClass *cls, TypeSyste
 QString AbstractMetaFunction::typeReplaced(int key) const
 {
     FunctionModificationList modifications = this->modifications(declaringClass());
-    foreach (FunctionModification modification, modifications) {
-        QList<ArgumentModification> argument_modifications = modification.argument_mods;
-        foreach (ArgumentModification argument_modification, argument_modifications) {
+    foreach (const FunctionModification &modification, modifications) {
+        const QList<ArgumentModification> &argument_modifications = modification.argument_mods;
+        foreach (const ArgumentModification &argument_modification, argument_modifications) {
             if (argument_modification.index == key
                 && !argument_modification.modified_type.isEmpty()) {
                 return argument_modification.modified_type;
@@ -678,7 +678,7 @@ QString AbstractMetaFunction::modifiedName() const
 {
     if (m_cached_modified_name.isEmpty()) {
         FunctionModificationList mods = modifications(implementingClass());
-        foreach (FunctionModification mod, mods) {
+        foreach (const FunctionModification &mod, mods) {
             if (mod.isRenameModifier()) {
                 m_cached_modified_name = mod.renamedToName;
                 break;
@@ -745,6 +745,11 @@ QString AbstractMetaFunction::targetLangSignature(bool minimal) const
 bool function_sorter(AbstractMetaFunction *a, AbstractMetaFunction *b)
 {
     return a->signature() < b->signature();
+}
+
+bool enum_sorter(AbstractMetaEnum *a, AbstractMetaEnum *b)
+{
+    return a->fullName() < b->fullName();
 }
 
 /*******************************************************************************
@@ -964,7 +969,12 @@ AbstractMetaFunctionList AbstractMetaClass::virtualOverrideFunctions() const
 
 void AbstractMetaClass::sortFunctions()
 {
-    qSort(m_functions.begin(), m_functions.end(), function_sorter);
+    std::sort(m_functions.begin(), m_functions.end(), function_sorter);
+}
+
+void AbstractMetaClass::sortEnums()
+{
+    std::sort(m_enums.begin(), m_enums.end(), enum_sorter);
 }
 
 void AbstractMetaClass::setFunctions(const AbstractMetaFunctionList &functions)
@@ -1081,7 +1091,7 @@ void AbstractMetaClass::addFunction(AbstractMetaFunction *function)
 
     if (!function->isDestructor()) {
         m_functions << function;
-        qSort(m_functions.begin(), m_functions.end(), function_sorter);
+        std::sort(m_functions.begin(), m_functions.end(), function_sorter);
     }
 
 
@@ -1230,7 +1240,7 @@ static AbstractMetaFunction *createXetter(const AbstractMetaField *g, const QStr
     f->setOriginalAttributes(attr);
 
     FieldModificationList mods = g->modifications();
-    foreach (FieldModification mod, mods) {
+    foreach (const FieldModification &mod, mods) {
         if (mod.isRenameModifier())
             f->setName(mod.renamedTo());
         if (mod.isAccessModifier()) {
@@ -1253,7 +1263,7 @@ FieldModificationList AbstractMetaField::modifications() const
     FieldModificationList mods = enclosingClass()->typeEntry()->fieldModifications();
     FieldModificationList returned;
 
-    foreach (FieldModification mod, mods) {
+    foreach (const FieldModification &mod, mods) {
         if (mod.name == name())
             returned += mod;
     }
@@ -1486,7 +1496,7 @@ void AbstractMetaClass::addInterface(AbstractMetaClass *interface)
 
             // Copy the modifications in interface into the implementing classes.
             FunctionModificationList mods = function->modifications(interface);
-            foreach  (const FunctionModification &mod, mods) {
+            foreach (const FunctionModification &mod, mods) {
                 m_type_entry->addFunctionModification(mod);
             }
 
@@ -1733,7 +1743,7 @@ void AbstractMetaClass::fixFunctions()
                                 bool hasNonFinalModifier = false;
                                 bool isBaseImplPrivate = false;
                                 FunctionModificationList mods = sf->modifications(sf->implementingClass());
-                                foreach (FunctionModification mod, mods) {
+                                foreach (const FunctionModification &mod, mods) {
                                     if (mod.isNonFinal()) {
                                         hasNonFinalModifier = true;
                                         break;

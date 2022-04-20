@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
         FileOut::license = true;
 
     if (args.contains("rebuild-only")) {
-        QStringList classes = args.value("rebuild-only").split(",", QString::SkipEmptyParts);
+        QStringList classes = args.value("rebuild-only").split(",", Qt::SkipEmptyParts);
         TypeDatabase::instance()->setRebuildClasses(classes);
     }
 
@@ -143,8 +143,8 @@ int main(int argc, char *argv[])
     }
 
     if (args.contains("ast-to-xml")) {
-	astToXML(pp_file);
-	return 0;
+        astToXML(pp_file);
+        return 0;
     }
 
     gs->buildModel(pp_file);

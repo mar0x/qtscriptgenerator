@@ -955,7 +955,7 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
            << "    else if (var.userType() == qMetaTypeId<" << qualifiedEnumName << ">())" << endl
            << "        out = qvariant_cast<" << qualifiedEnumName << ">(var);" << endl
            << "    else" << endl
-           << "        out = 0;" << endl
+           << "        out = " << qualifiedFlagsName << "();" << endl
            << "}" << endl << endl;
 
     // write constructor
@@ -963,7 +963,7 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
            << qtScriptFlagsName
            << "(QScriptContext *context, QScriptEngine *engine)" << endl;
     stream << "{" << endl;
-    stream << "    " << qualifiedFlagsName << " result = 0;" << endl;
+    stream << "    " << qualifiedFlagsName << " result;" << endl;
     stream << "    if ((context->argumentCount() == 1) && context->argument(0).isNumber()) {" << endl;
     stream << "        result = static_cast<" << qualifiedFlagsName << ">(context->argument(0).toInt32());" << endl;
     stream << "    } else {" << endl;
@@ -1069,17 +1069,23 @@ void maybeDeclareMetaType(QTextStream &stream, const QString &typeName,
     if (name.contains(QLatin1Char(','))) {
         // need to expand the Q_DECLARE_METATYPE macro manually,
         // otherwise the compiler will choke
-        stream << "template <> \\" << endl
-               << "struct QMetaTypeId< " << name << " > \\" << endl
-               << "{ \\" << endl
-               << "    enum { Defined = 1 }; \\" << endl
-               << "    static int qt_metatype_id() \\" << endl
-               << "    { \\" << endl
-               << "        static QBasicAtomicInt metatype_id = Q_BASIC_ATOMIC_INITIALIZER(0); \\" << endl
-               << "        if (!metatype_id.load()) \\" << endl
-               << "            metatype_id.store(qRegisterMetaType< " << name << " >(\"" << name << "\")); \\" << endl
-               << "        return metatype_id.load(); \\" << endl
-               << "    } \\" << endl
+        stream << "template <>" << endl
+               << "struct QMetaTypeId< " << name << " >" << endl
+               << "{" << endl
+               << "    enum { Defined = 1 };" << endl
+               << "    static int qt_metatype_id()" << endl
+               << "    {" << endl
+               << "        static QBasicAtomicInt metatype_id = Q_BASIC_ATOMIC_INITIALIZER(0);" << endl
+               << "#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)" << endl
+               << "        if (!metatype_id.load())" << endl
+               << "            metatype_id.store(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << endl
+               << "        return metatype_id.load();" << endl
+               << "#else" << endl
+               << "        if (!metatype_id.loadRelaxed())" << endl
+               << "            metatype_id.storeRelaxed(qRegisterMetaType< " << name << " >(\"" << name << "\"));" << endl
+               << "        return metatype_id.loadRelaxed();" << endl
+               << "#endif" << endl
+               << "    }" << endl
                << "};" << endl;
     } else {
         stream << "Q_DECLARE_METATYPE(" << name << ")" << endl;
@@ -1513,7 +1519,7 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     }
     {
         IncludeList includes = meta_class->typeEntry()->extraIncludes();
-        qSort(includes.begin(), includes.end());
+        std::sort(includes.begin(), includes.end());
 
         foreach (const Include &i, includes) {
             writeInclude(stream, i);
@@ -1757,7 +1763,7 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     stream << "//" << endl << endl;
 
     if (!meta_class->isNamespace()) {
-        if (!nameToPrototypeFunctions.isEmpty() || !meta_class->hasDefaultToStringFunction())
+        if (!nameToPrototypeFunctions.isEmpty() /* || !meta_class->hasDefaultToStringFunction() */)
             writePrototypeCall(stream, meta_class, nameToPrototypeFunctions, prototypeFunctionsOffset);
     }
 
@@ -1815,7 +1821,6 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
             }
         }
         if (!nameToPrototypeFunctions.isEmpty()) {
-            QMap<QString, AbstractMetaFunctionList>::const_iterator it;
             int count = nameToPrototypeFunctions.size();
             if (!meta_class->hasDefaultToStringFunction())
                 ++count;
@@ -1858,7 +1863,6 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     stream << "    ctor.setData(QScriptValue(engine, uint(0xBABE0000 + 0)));" << endl;
     if (!nameToStaticFunctions.isEmpty()) {
         // static functions
-        QMap<QString, AbstractMetaFunctionList>::const_iterator it;
         stream << "    for (int i = 0; i < " << nameToStaticFunctions.size() << "; ++i) {" << endl
                << "        QScriptValue fun = engine->newFunction(qtscript_" << meta_class->name()
                << "_static_call," << endl

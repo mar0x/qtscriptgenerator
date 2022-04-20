@@ -56,6 +56,11 @@ void maybeDeclareMetaType(QTextStream &stream, const QString &typeName,
                           QSet<QString> &registeredTypeNames);
 bool hasDefaultConstructor(const AbstractMetaClass *meta_class);
 
+bool clsNameLess(const AbstractMetaClass* a, const AbstractMetaClass* b)
+{
+    return a->qualifiedCppName() < b->qualifiedCppName();
+}
+
 void SetupGenerator::generate()
 {
     QHashIterator<QString, QList<const AbstractMetaClass*> > pack(packHash);
@@ -64,6 +69,8 @@ void SetupGenerator::generate()
         QList<const AbstractMetaClass*> list = pack.value();
         if (list.isEmpty())
             continue;
+
+        std::sort(list.begin(), list.end(), clsNameLess);
 
         QString packName = pack.key();
         packName.replace(".", "_");

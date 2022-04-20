@@ -739,7 +739,7 @@ class ComplexTypeEntry : public TypeEntry
 public:
     enum TypeFlag {
         ForceAbstract      = 0x1,
-	    DeleteInMainThread = 0x2,
+        DeleteInMainThread = 0x2,
         Deprecated         = 0x4
     };
     typedef QFlags<TypeFlag> TypeFlags;
@@ -749,8 +749,7 @@ public:
           m_qualified_cpp_name(name),
           m_qobject(false),
           m_polymorphic_base(false),
-          m_generic_class(false),
-          m_type_flags(0)
+          m_generic_class(false)
     {
         Include inc;
         inc.name = "QVariant";
@@ -1105,7 +1104,7 @@ public:
         SingleTypeEntryHash returned;
         QList<QString> keys = entries.keys();
 
-        foreach(QString key, keys) {
+        foreach(const QString &key, keys) {
             returned[key] = findType(key);
         }
 
@@ -1144,7 +1143,7 @@ public:
         foreach (const QString &_warning, m_suppressedWarnings) {
             QString warning(QString(_warning).replace("\\*", "&place_holder_for_asterisk;"));
 
-            QStringList segs = warning.split("*", QString::SkipEmptyParts);
+            QStringList segs = warning.split("*", Qt::SkipEmptyParts);
             if (segs.size() == 0)
                 continue ;
 

@@ -173,7 +173,7 @@ void JSXGenerator::generate()
         for (it = packHash.constBegin(); it != packHash.constEnd(); ++it) {
             QString package = it.key();
             QList<const AbstractMetaClass*> classesInPackage = it.value();
-            qSort(classesInPackage.begin(), classesInPackage.end(), classLessThan);
+            std::sort(classesInPackage.begin(), classesInPackage.end(), classLessThan);
 
             QString packageName = QStringList(package.split(".").mid(2)).join("_");
             FileOut file(m_out_dir + "/jsx/" + packageName + ".jsx");
@@ -1048,8 +1048,8 @@ void JSXGenerator::write(QTextStream &o, const AbstractMetaClass *meta_class)
         includes.remove("qvector");
         includes.remove("date");
         includes.remove("regexp");
-        QStringList includeFiles = includes.toList();
-        qSort(includeFiles.begin(), includeFiles.end());
+        QStringList includeFiles = includes.values();
+        std::sort(includeFiles.begin(), includeFiles.end());
 
         foreach (const QString &i, includeFiles) {
             writeInclude(o, i);

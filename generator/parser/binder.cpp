@@ -53,11 +53,10 @@
 
 #include <qdebug.h>
 
-Binder::Binder(CodeModel *__model, LocationManager &__location, Control *__control)
+Binder::Binder(CodeModel *__model, LocationManager &__location, Control * /* __control */)
   : _M_model(__model),
     _M_location(__location),
     _M_token_stream(&_M_location.token_stream),
-    _M_control(__control),
     _M_current_function_type(CodeModel::Normal),
     type_cc(this),
     name_cc(this),
@@ -298,7 +297,7 @@ void Binder::declare_symbol(SimpleDeclarationAST *node, InitDeclaratorAST *init_
       fun->setVariadics (decl_cc.isVariadics ());
 
       // ... and the signature
-      foreach (DeclaratorCompiler::Parameter p, decl_cc.parameters())
+      foreach (const DeclaratorCompiler::Parameter &p, decl_cc.parameters())
         {
           ArgumentModelItem arg = model()->create<ArgumentModelItem>();
           arg->setType(qualifyType(p.type, _M_context));
@@ -328,7 +327,7 @@ void Binder::declare_symbol(SimpleDeclarationAST *node, InitDeclaratorAST *init_
         {
           typeInfo.setFunctionPointer (true);
           decl_cc.run (init_declarator->declarator);
-          foreach (DeclaratorCompiler::Parameter p, decl_cc.parameters())
+          foreach (const DeclaratorCompiler::Parameter &p, decl_cc.parameters())
             typeInfo.addArgument(p.type);
         }
 
@@ -400,7 +399,7 @@ void Binder::visitFunctionDefinition(FunctionDefinitionAST *node)
 
   _M_current_function->setVariadics (decl_cc.isVariadics ());
 
-  foreach (DeclaratorCompiler::Parameter p, decl_cc.parameters())
+  foreach (const DeclaratorCompiler::Parameter &p, decl_cc.parameters())
     {
       ArgumentModelItem arg = model()->create<ArgumentModelItem>();
       arg->setType(qualifyType(p.type, functionScope->qualifiedName()));
@@ -552,7 +551,7 @@ void Binder::visitTypedef(TypedefAST *node)
         {
           typeInfo.setFunctionPointer (true);
           decl_cc.run (init_declarator->declarator);
-          foreach (DeclaratorCompiler::Parameter p, decl_cc.parameters())
+          foreach (const DeclaratorCompiler::Parameter &p, decl_cc.parameters())
             typeInfo.addArgument(p.type);
         }
 
@@ -894,7 +893,7 @@ TypeInfo Binder::qualifyType(const TypeInfo &type, const QStringList &context) c
 
           if (ClassModelItem klass = model_dynamic_cast<ClassModelItem> (scope))
             {
-              foreach (QString base, klass->baseClasses ())
+              foreach (const QString &base, klass->baseClasses ())
                 {
                   QStringList ctx = context;
                   ctx.removeLast();

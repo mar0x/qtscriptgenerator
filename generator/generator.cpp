@@ -71,6 +71,9 @@ void Generator::generate()
         ReportHandler::debugSparse(QString("generating: %1").arg(fileName));
 
         FileOut fileOut(outputDirectory() + "/" + subDirectoryForClass(cls) + "/" + fileName);
+
+        cls->sortEnums();
+
         write(fileOut.stream, cls);
 
         if( fileOut.done() )
@@ -85,9 +88,9 @@ void Generator::printClasses()
     QTextStream s(stdout);
 
     AbstractMetaClassList classes = m_classes;
-    qSort(classes);
+    std::sort(classes.begin(), classes.end());
 
-    foreach (AbstractMetaClass *cls, classes) {
+    foreach (const AbstractMetaClass *cls, classes) {
         if (!shouldGenerate(cls))
             continue;
         write(s, cls);

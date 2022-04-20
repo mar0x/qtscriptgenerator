@@ -101,7 +101,7 @@ void DocGenerator::generate()
     for (it = packHash.constBegin(); it != packHash.constEnd(); ++it) {
         QString package = it.key();
         QList<const AbstractMetaClass*> classesInPackage = it.value();
-        qSort(classesInPackage.begin(), classesInPackage.end(), classLessThan);
+        std::sort(classesInPackage.begin(), classesInPackage.end(), classLessThan);
 
         FileOut file(m_out_dir + "/doc/" + package.split(".").join("_") + ".html");
 
@@ -140,7 +140,7 @@ void DocGenerator::generate()
                     << "<p><table width=\"100%\" class=\"annotated\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\">" << endl;
 
         AbstractMetaClassList sortedClasses = m_classes;
-        qSort(sortedClasses.begin(), sortedClasses.end(), classLessThan);
+        std::sort(sortedClasses.begin(), sortedClasses.end(), classLessThan);
 
         for (int i = 0; i < sortedClasses.size(); ++i) {
             const AbstractMetaClass *cls = sortedClasses.at(i);
@@ -171,7 +171,7 @@ void DocGenerator::generate()
         file.stream << "<h3>Packages</h3>" << endl;
         file.stream << "<ul>" << endl;
         QStringList sortedPackages = packHash.keys();
-        qSort(sortedPackages.begin(), sortedPackages.end());
+        std::sort(sortedPackages.begin(), sortedPackages.end());
         for (int i = 0; i < sortedPackages.size(); ++i) {
             QString pkg = sortedPackages.at(i);
             file.stream << "<li><b><a href=\"" << pkg.split(".").join("_") << ".html\">"

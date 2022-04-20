@@ -82,7 +82,7 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
     s << "#include <QtScript/QScriptEngine>" << endl;
 
     IncludeList list = meta_class->typeEntry()->extraIncludes();
-    qSort(list.begin(), list.end(), include_less_than);
+    std::sort(list.begin(), list.end(), include_less_than);
     foreach (const Include &inc, list) {
         if (inc.type == Include::TargetLangImport)
             continue;
@@ -178,7 +178,16 @@ void ShellImplGenerator::write(QTextStream &s, const AbstractMetaClass *meta_cla
             // call the C++ implementation
             if (fun->type())
                 s << "return ";
-            s << meta_class->qualifiedCppName() << "::" << fun->originalName() << "(";
+
+            if (fun->originalName() == "hasChildren" &&
+              (meta_class->qualifiedCppName() == "QAbstractTableModel" ||
+                meta_class->qualifiedCppName() == "QAbstractListModel")) {
+                s << "QAbstractItemModel";
+            } else {
+                s << meta_class->qualifiedCppName();
+            }
+            s << "::" << fun->originalName() << "(";
+
             for (int i = 0; i < args.size(); ++i) {
                 if (i > 0)
                     s << ", ";

@@ -48,7 +48,8 @@
 
 #include <memory>
 
-#include <QtXml>
+#include <QFile>
+#include <QXmlStreamReader>
 
 QString strings_Object = QLatin1String("Object");
 QString strings_String = QLatin1String("String");
@@ -133,7 +134,7 @@ class StackElement
     } value;
 };
 
-class Handler : public QXmlDefaultHandler
+class Handler
 {
 public:
     Handler(TypeDatabase *database, bool generate)
@@ -178,22 +179,21 @@ public:
         tagNames["reference-count"] = StackElement::ReferenceCount;
     }
 
-    bool startElement(const QString &namespaceURI, const QString &localName,
-                      const QString &qName, const QXmlAttributes &atts);
-    bool endElement(const QString &namespaceURI, const QString &localName, const QString &qName);
+    bool startElement(QStringRef name, QXmlStreamAttributes atts);
+    bool endElement(QStringRef name);
 
     QString errorString() const { return m_error; }
-    bool error(const QXmlParseException &exception);
-    bool fatalError(const QXmlParseException &exception);
-    bool warning(const QXmlParseException &exception);
+    //bool error(const QXmlParseException &exception);
+    //bool fatalError(const QXmlParseException &exception);
+    //bool warning(const QXmlParseException &exception);
 
     bool characters(const QString &ch);
 
 private:
-    void fetchAttributeValues(const QString &name, const QXmlAttributes &atts,
+    void fetchAttributeValues(const QString &name, const QXmlStreamAttributes &atts,
                               QHash<QString, QString> *acceptedAttributes);
 
-    bool importFileElement(const QXmlAttributes &atts);
+    bool importFileElement(const QXmlStreamAttributes &atts);
     bool convertBoolean(const QString &, const QString &, bool);
 
     TypeDatabase *m_database;
@@ -211,7 +211,7 @@ private:
 
     QHash<QString, StackElement::ElementType> tagNames;
 };
-
+/*
 bool Handler::error(const QXmlParseException &e)
 {
     qWarning("Error: line=%d, column=%d, message=%s\n",
@@ -234,15 +234,16 @@ bool Handler::warning(const QXmlParseException &e)
 
     return false;
 }
+*/
 
-void Handler::fetchAttributeValues(const QString &name, const QXmlAttributes &atts,
+void Handler::fetchAttributeValues(const QString &name, const QXmlStreamAttributes &atts,
                                    QHash<QString, QString> *acceptedAttributes)
 {
     Q_ASSERT(acceptedAttributes != 0);
 
-    for (int i=0; i<atts.length(); ++i) {
-        QString key = atts.localName(i).toLower();
-        QString val = atts.value(i);
+    foreach (const QXmlStreamAttribute& a, atts) {
+        QString key = a.name().toString().toLower();
+        QString val = a.value().toString();
 
         if (!acceptedAttributes->contains(key)) {
             ReportHandler::warning(QString("Unknown attribute for '%1': '%2'").arg(name).arg(key));
@@ -252,9 +253,9 @@ void Handler::fetchAttributeValues(const QString &name, const QXmlAttributes &at
     }
 }
 
-bool Handler::endElement(const QString &, const QString &localName, const QString &)
+bool Handler::endElement(QStringRef name)
 {
-    QString tagName = localName.toLower();
+    QString tagName = name.toString().toLower();
     if(tagName == "import-file")
         return true;
 
@@ -365,9 +366,9 @@ bool Handler::characters(const QString &ch)
     return true;
 }
 
-bool Handler::importFileElement(const QXmlAttributes &atts)
+bool Handler::importFileElement(const QXmlStreamAttributes &atts)
 {
-    QString fileName = atts.value("name");
+    QString fileName = atts.value("name").toString();
     if(fileName.isEmpty()){
         m_error = "Required attribute 'name' missing for include-file tag.";
         return false;
@@ -382,11 +383,11 @@ bool Handler::importFileElement(const QXmlAttributes &atts)
         }
     }
 
-    QString quoteFrom = atts.value("quote-after-line");
+    QString quoteFrom = atts.value("quote-after-line").toString();
     bool foundFromOk = quoteFrom.isEmpty();
     bool from = quoteFrom.isEmpty();
 
-    QString quoteTo = atts.value("quote-before-line");
+    QString quoteTo = atts.value("quote-before-line").toString();
     bool foundToOk = quoteTo.isEmpty();
     bool to = true;
 
@@ -437,15 +438,15 @@ bool Handler::convertBoolean(const QString &_value, const QString &attributeName
     }
 }
 
-bool Handler::startElement(const QString &, const QString &n,
-                           const QString &, const QXmlAttributes &atts)
+bool Handler::startElement(QStringRef n, QXmlStreamAttributes atts)
 {
-    QString tagName = n.toLower();
+    QString tagName = n.toString().toLower();
+
     if(tagName == "import-file"){
         return importFileElement(atts);
     }
 
-    std::auto_ptr<StackElement> element(new StackElement(current));
+    std::unique_ptr<StackElement> element(new StackElement(current));
 
     if (!tagNames.contains(tagName)) {
         m_error = QString("Unknown tag name: '%1'").arg(tagName);
@@ -1252,7 +1253,7 @@ bool Handler::startElement(const QString &, const QString &n,
 
                 if (rc.action == ReferenceCount::Invalid) {
                     m_error = "unrecognized value for action attribute. supported actions:";
-                    foreach (QString action, actions.keys())
+                    foreach (const QString &action, actions.keys())
                         m_error += " " + action;
                 }
 
@@ -1479,17 +1480,45 @@ bool TypeDatabase::parseFile(const QString &filename, bool generate)
 {
     QFile file(filename);
     Q_ASSERT(file.exists());
-    QXmlInputSource source(&file);
+
+    file.open(QIODevice::ReadOnly);
 
     int count = m_entries.size();
 
-    QXmlSimpleReader reader;
+    QXmlStreamReader reader(&file);
+
     Handler handler(this, generate);
 
-    reader.setContentHandler(&handler);
-    reader.setErrorHandler(&handler);
+    while (!reader.atEnd()) {
+        QXmlStreamReader::TokenType tt = reader.readNext();
 
-    bool ok = reader.parse(&source, false);
+        switch(tt) {
+        case QXmlStreamReader::NoToken:
+        case QXmlStreamReader::Invalid:
+            qDebug() << "parseFile(" << filename << "): error "
+                << reader.error() << "; " << reader.errorString() << " at "
+                << reader.lineNumber() << ":" << reader.columnNumber();
+            break;
+
+        case QXmlStreamReader::StartDocument:
+        case QXmlStreamReader::EndDocument:
+            break;
+
+        case QXmlStreamReader::StartElement:
+            handler.startElement(reader.name(), reader.attributes());
+            break;
+
+        case QXmlStreamReader::EndElement:
+            handler.endElement(reader.name());
+            break;
+        case QXmlStreamReader::Characters:
+        case QXmlStreamReader::Comment:
+        case QXmlStreamReader::DTD:
+        case QXmlStreamReader::EntityReference:
+        case QXmlStreamReader::ProcessingInstruction:
+            break;
+        }
+    }
 
     int newCount = m_entries.size();
 
@@ -1497,7 +1526,7 @@ bool TypeDatabase::parseFile(const QString &filename, bool generate)
                                .arg(filename)
                                .arg(newCount - count));
 
-    return ok;
+    return true;
 }
 
 QString PrimitiveTypeEntry::javaObjectName() const
@@ -1828,7 +1857,7 @@ QString TemplateInstance::expandCode() const{
     TemplateEntry *templateEntry = TypeDatabase::instance()->findTemplate(m_name);
     if(templateEntry){
         QString res = templateEntry->code();
-        foreach(QString key, replaceRules.keys()){
+        foreach(const QString &key, replaceRules.keys()){
             res.replace(key, replaceRules[key]);
         }
         return "// TEMPLATE - " + m_name + " - START" + res + "// TEMPLATE - " + m_name + " - END";
@@ -1874,7 +1903,7 @@ QString FunctionModification::toString() const
     if (modifiers & Writable) str += QLatin1String("writable");
 
     if (modifiers & CodeInjection) {
-        foreach (CodeSnip s, snips) {
+        foreach (const CodeSnip &s, snips) {
             str += QLatin1String("\n//code injection:\n");
             str += s.code();
         }

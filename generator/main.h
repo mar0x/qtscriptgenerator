@@ -111,7 +111,7 @@ struct Preprocess
             includes << qtdir;
         }
 
-        foreach (QString include, includes) {
+        foreach (const QString &include, includes) {
             preprocess.push_include_path(QDir::toNativeSeparators(include).toStdString());
         }
 

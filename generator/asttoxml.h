@@ -49,10 +49,10 @@
 #include <QXmlStreamWriter>
 
 void astToXML(const QString name);
-void writeOutNamespace(QXmlStreamWriter &s, NamespaceModelItem &item);
-void writeOutEnum(QXmlStreamWriter &s, EnumModelItem &item);
-void writeOutFunction(QXmlStreamWriter &s, FunctionModelItem &item);
-void writeOutClass(QXmlStreamWriter &s, ClassModelItem &item);
+void writeOutNamespace(QXmlStreamWriter &s, const NamespaceModelItem &item);
+void writeOutEnum(QXmlStreamWriter &s, const EnumModelItem &item);
+void writeOutFunction(QXmlStreamWriter &s, const FunctionModelItem &item);
+void writeOutClass(QXmlStreamWriter &s, const ClassModelItem &item);
 
 
 #endif // ASTTOXML

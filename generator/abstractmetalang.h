@@ -188,8 +188,7 @@ public:
         m_constant(false),
         m_reference(false),
         m_cpp_instantiation(true),
-        m_indirections(0),
-        m_reserved(0)
+        m_indirections(0)
     {
     }
 
@@ -310,7 +309,6 @@ private:
     uint m_reference : 1;
     uint m_cpp_instantiation : 1;
     int m_indirections : 4;
-    uint m_reserved : 25; // unused
 };
 
 class AbstractMetaVariable
@@ -631,7 +629,6 @@ private:
     AbstractMetaClass *m_class;
 
     uint m_has_qenums_declaration : 1;
-    uint m_reserved : 31;
 };
 
 typedef QList<AbstractMetaEnum *> AbstractMetaEnumList;
@@ -668,9 +665,7 @@ public:
     };
 
     AbstractMetaClass()
-        : m_namespace(false),
-          m_qobject(false),
-          m_has_virtuals(false),
+        : m_has_virtuals(false),
           m_has_nonpublic(false),
           m_has_virtual_slots(false),
           m_has_nonprivateconstructor(false),
@@ -728,7 +723,7 @@ public:
     AbstractMetaFunctionList virtualFunctions() const;
     AbstractMetaFunctionList nonVirtualShellFunctions() const;
 
-    AbstractMetaFieldList fields() const { return m_fields; }
+    const AbstractMetaFieldList& fields() const { return m_fields; }
     void setFields(const AbstractMetaFieldList &fields) { m_fields = fields; }
     void addField(AbstractMetaField *field) { m_fields << field; }
 
@@ -831,6 +826,7 @@ public:
     AbstractMetaFunctionList greaterThanEqFunctions() const { return m_greater_than_eq_functions; }
 
     void sortFunctions();
+    void sortEnums();
 
     const AbstractMetaClass *templateBaseClass() const { return m_template_base_class; }
     void setTemplateBaseClass(const AbstractMetaClass *cls) { m_template_base_class = cls; }
@@ -839,8 +835,6 @@ public:
     bool isTypeAlias() const { return m_is_type_alias; }
 
 private:
-    uint m_namespace : 1;
-    uint m_qobject : 1;
     uint m_has_virtuals : 1;
     uint m_has_nonpublic : 1;
     uint m_has_virtual_slots : 1;
@@ -852,7 +846,6 @@ private:
     uint m_has_equals_operator : 1;
     uint m_has_clone_operator :1;
     uint m_is_type_alias : 1;
-    uint m_reserved : 19;
 
     QString m_destructor_exception;
 
