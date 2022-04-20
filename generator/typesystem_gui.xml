@@ -374,7 +374,7 @@
     if ((context-&gt;argumentCount() == 1) &amp;&amp; (qMetaTypeId&lt;QTextFormat&gt;() == context-&gt;argument(0).toVariant().userType())) {
         QTextFormat _q_arg0 = qscriptvalue_cast&lt;QTextFormat&gt;(context-&gt;argument(0));
         QTextFormat _q_cpp_result(_q_arg0);
-        QScriptValue _q_result = context-&gt;engine()-&gt;newVariant(context-&gt;thisObject(), qVariantFromValue(_q_cpp_result));
+        QScriptValue _q_result = context-&gt;engine()-&gt;newVariant(context-&gt;thisObject(), QVariant::fromValue(_q_cpp_result));
         return _q_result;
     }
     </inject-code>

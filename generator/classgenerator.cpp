@@ -448,7 +448,7 @@ static void writeConstructorCallAndReturn(QTextStream &stream, const AbstractMet
         stream << "Variant";
     stream << "(context->thisObject(), ";
     if (!isQObjectBased(meta_class))
-        stream << "qVariantFromValue(";
+        stream << "QVariant::fromValue(";
     if (meta_class->generateShellClass()) {
         stream << "(" << meta_class->qualifiedCppName();
         if (useNew)
@@ -917,7 +917,7 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
     stream << "    for (int i = 0; i < " << uniqueIndexes.size() << "; ++i) {" << endl
            << "        clazz.setProperty(QString::fromLatin1(qtscript_"
            << qtScriptEnumName << "_keys[i])," << endl
-           << "            engine->newVariant(qVariantFromValue(qtscript_"
+           << "            engine->newVariant(QVariant::fromValue(qtscript_"
            << qtScriptEnumName << "_values[i]))," << endl
            << "            QScriptValue::ReadOnly | QScriptValue::Undeletable);" << endl
            << "    }" << endl;
@@ -943,7 +943,7 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
            << qtScriptFlagsName << "_toScriptValue("
            << "QScriptEngine *engine, const " << qualifiedFlagsName << " &value)" << endl
            << "{" << endl
-           << "    return engine->newVariant(qVariantFromValue(value));" << endl
+           << "    return engine->newVariant(QVariant::fromValue(value));" << endl
            << "}" << endl << endl;
     stream << "static void qtscript_"
            << qtScriptFlagsName << "_fromScriptValue("
@@ -978,7 +978,7 @@ static void writeEnumClass(QTextStream &stream, const AbstractMetaClass *meta_cl
            << ">(v);" << endl;
     stream << "        }" << endl;
     stream << "   }" << endl;
-    stream << "    return engine->newVariant(qVariantFromValue(result));" << endl;
+    stream << "    return engine->newVariant(QVariant::fromValue(result));" << endl;
     stream << "}" << endl;
     stream << endl;
 
@@ -1794,7 +1794,7 @@ void ClassGenerator::write(QTextStream &stream, const AbstractMetaClass *meta_cl
     if (!meta_class->isNamespace()) {
         stream << "    engine->setDefaultPrototype(qMetaTypeId<"
                << meta_class->qualifiedCppName() << "*>(), QScriptValue());" << endl;
-        stream << "    QScriptValue proto = engine->newVariant(qVariantFromValue(("
+        stream << "    QScriptValue proto = engine->newVariant(QVariant::fromValue(("
                << meta_class->qualifiedCppName() << "*)0));" << endl;
         bool havePrototypePrototype = false;
         if (meta_class->baseClass() != 0) {
